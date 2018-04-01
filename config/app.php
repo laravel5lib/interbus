@@ -159,7 +159,38 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+    ],
 
+    'authenticatedJobs' => [
+        'character' => [
+            \App\Jobs\Character\CharacterAttributesJob::class,
+            \App\Jobs\Character\CharacterBlueprintsJob::class,
+            \App\Jobs\Character\CharacterChatChannelsJob::class,
+            \App\Jobs\Character\CharacterClonesJob::class,
+            \App\Jobs\Character\CharacterContactsJob::class,
+            \App\Jobs\Character\CharacterFatigueJob::class,
+            \App\Jobs\Character\CharacterMedalsJob::class,
+            \App\Jobs\Character\CharacterNotificationsJob::class,
+            \App\Jobs\Character\CharacterRolesJob::class,
+            \App\Jobs\Character\CharacterSkillQueueJob::class,
+            \App\Jobs\Character\CharacterSkillsJob::class,
+            \App\Jobs\Character\CharacterStandingsJob::class,
+            \App\Jobs\Character\CharacterTitlesJob::class,
+            \App\Jobs\Character\CharacterWalletBalanceJob::class,
+            \App\Jobs\Character\CharacterWalletJournalJob::class,
+            \App\Jobs\Character\CharacterMiningJob::class,
+        ],
+        'corporation' => [
+
+        ]
+    ],
+    'publicJobs' => [
+        'character' => [
+            \App\Jobs\Character\CharacterUpdateJob::class
+        ],
+        'corporation' => [
+
+        ]
     ],
 
     /*

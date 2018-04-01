@@ -1,6 +1,10 @@
 /node_modules
+/public/images/vendor
 /public/hot
 /public/storage
+/public/js/vendor
+/public/vendor
+/public/fonts/vendor
 /storage/*.key
 /vendor
 /.idea
