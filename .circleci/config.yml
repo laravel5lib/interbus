@@ -53,6 +53,8 @@ jobs:
       - run: ./vendor/bin/phpunit
 
   deploy-stage:
+    docker:
+      - image: docker:latest
     steps:
       - ssh interbus-deploy@staging.interbus.space && echo "Test" > test.txt
 
