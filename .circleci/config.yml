@@ -56,7 +56,7 @@ jobs:
     docker:
       - image: docker:latest
     steps:
-      - ssh interbus-deploy@staging.interbus.space && echo "Test" > test.txt
+      - run: ssh interbus-deploy@staging.interbus.space && echo "Test" > test.txt
 
 
 
