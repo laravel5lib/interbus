@@ -13,7 +13,7 @@ class QueueAuthenticatedCharacters extends Command
      *
      * @var string
      */
-    protected $signature = 'seat:auth';
+    protected $signature = 'interbus:auth';
 
     /**
      * The console command description.

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\AllianceUpdateJob;
-use App\Repositories\AllianceRepository;
+use App\Models\Alliance\Alliance;
 use Illuminate\Console\Command;
 use tristanpollard\ESIClient\Services\ESIClient;
 
@@ -14,7 +14,7 @@ class AddAlliances extends Command
      *
      * @var string
      */
-    protected $signature = 'seat:alliances';
+    protected $signature = 'interbus:alliances';
 
     /**
      * The console command description.
@@ -38,11 +38,12 @@ class AddAlliances extends Command
      *
      * @return mixed
      */
-    public function handle(ESIClient $client, AllianceRepository $allianceRepository)
+    public function handle(ESIClient $client)
     {
         $response = $client->invoke('/alliances/');
         $alliances = $response->get('result');
-        $unknownAlliances = $allianceRepository->checkAlliancesExist($alliances);
+        $knownAlliances = Alliance::select('alliance_id')->whereIn('alliance_id', $alliances)->get()->pluck('alliance_id');
+        $unknownAlliances = $alliances->diff($knownAlliances);
 
         foreach ($unknownAlliances as $alliance){
             dispatch(new AllianceUpdateJob($alliance));
