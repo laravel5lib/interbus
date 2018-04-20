@@ -63,7 +63,7 @@ jobs:
       - run: yum install -y openssh-server openssh-clients
       - run: ssh -oStrictHostKeyChecking=no interbus@staging.interbus.space 'cd /var/www/interbus && php artisan down && git fetch origin && git pull && composer install && yarn install && yarn production && php artisan migrate && php artisan cache:clear && php artisan config:cache && php artisan view:cache && php artisan horizon:terminate && php artisan up'
 
-  deploy-prod:
+  deploy-production:
     docker:
       - image: centos:latest
 
@@ -76,15 +76,15 @@ workflows:
   build-deploy:
     jobs:
       - build
+      - deploy-production:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
       - deploy-stage:
           requires:
             - build
           filters:
             branches:
               only: dev
-      - deploy_prod:
-          requries:
-            - build
-          filters:
-            branches:
-              only: master
