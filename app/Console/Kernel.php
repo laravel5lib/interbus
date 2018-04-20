@@ -28,7 +28,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(new QueueAuthenticatedCharacters())->hourly()->withoutOverlapping();
+        //$schedule->job(new QueueAuthenticatedCharacters())->hourly()->withoutOverlapping();
+        $schedule->command('interbus:auth')->hourly()->withoutOverlapping();
     }
 
     /**
