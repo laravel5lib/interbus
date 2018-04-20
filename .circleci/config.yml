@@ -55,7 +55,11 @@ jobs:
   deploy-stage:
     docker:
       - image: centos:latest
+
     steps:
+      add_ssh_keys:
+        fingerprints:
+          - “13:45:42:a9:87:b8:8c:1b:61:01:ac:42:17:2f:83:11”
       - run: yum install -y openssh-server openssh-clients
       - run: ssh -oStrictHostKeyChecking=no interbus-deploy@staging.interbus.space && echo "Test" > test.txt
 
