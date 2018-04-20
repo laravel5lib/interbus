@@ -1,24 +1,17 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import ReactPaginate from 'react-paginate';
-import { BeatLoader } from 'react-spinners';
 import {toastr} from 'react-redux-toastr'
 
 import { history } from '../../../helpers/history';
 
 import {
     Button,
-    Label,
     Row,
     Col,
-    FormGroup,
-    Input,
     Card,
     CardHeader,
-    CardFooter,
     CardBody,
     Table,
-    Badge
 } from 'reactstrap';
 import { connect } from 'react-redux';
 

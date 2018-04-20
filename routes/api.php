@@ -67,11 +67,15 @@ Route::post('/tokens/{token}', function ($code, \tristanpollard\ESIClient\Servic
         }
         $tokenModel = new \App\Models\Token($token->toArray());
         $user->tokens()->save($tokenModel);
+        $scopeModels = [];
         foreach ($scopes as $scope) {
-            $scopeModel = new \App\Models\Scope();
-            $scopeModel->scope = $scope;
-            $tokenModel->scopes()->save($scopeModel);
+            $scopeModel = [
+                'scope' => $scope,
+                'token' => $tokenModel->id,
+            ];
+            $scopeModels[] = $scopeModel;
         }
+        \App\Models\Scope::insert($scopeModels);
 
         if (!$existingToken) {
             dispatch(new \App\Jobs\AuthenticatedCharacterUpdateQueuer($tokenModel));

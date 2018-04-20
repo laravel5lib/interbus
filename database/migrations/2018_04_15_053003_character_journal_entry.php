@@ -24,7 +24,7 @@ class CharacterJournalEntry extends Migration
             $table->double('amount')->nullable();
             $table->double('balance')->nullable();
             $table->string('reason')->nullable();
-            $table->bigInteger('tax_reciever_id')->nullable();
+            $table->bigInteger('tax_receiver_id')->nullable();
             $table->double('tax')->nullable();
             $table->timestamps();
             $table->primary('ref_id');
