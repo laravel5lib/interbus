@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import {Card, CardHeader, CardBody, Table, Badge, Row, Col, TabContent, TabPane, Nav, NavItem, NavLink} from 'reactstrap';
+import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 
 import ContactsTable from '../../../components/ContactsTable/ContactsTable';
 import JournalTable from '../../../components/JournalTable/JournalTable';

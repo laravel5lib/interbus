@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import ReactPaginate from 'react-paginate';
-import $ from 'jquery';
 
 import {
     Label,
@@ -11,10 +9,8 @@ import {
     Input,
     Card,
     CardHeader,
-    CardFooter,
     CardBody,
     Table,
-    Badge
 } from 'reactstrap';
 
 class Characters extends Component {
@@ -31,7 +27,7 @@ class Characters extends Component {
     }
 
     loadFromServer(){
-        axios.get(`http://interbus.test/api/characters?offset=` + this.state['offset'] + "&itemsPerPage=" + this.state['itemsPerPage'] + "&q=" + this.query)
+        axios.get(`/api/characters?offset=` + this.state['offset'] + "&itemsPerPage=" + this.state['itemsPerPage'] + "&q=" + this.query)
             .then(res => {
                 const characters = res.data;
                 this.setState({
