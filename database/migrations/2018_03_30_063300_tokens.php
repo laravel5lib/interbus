@@ -16,7 +16,7 @@ class Tokens extends Migration
         Schema::create('tokens', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
-            $table->bigInteger('character_id')->unique();
+            $table->bigInteger('character_id');
             $table->string('character_name');
             $table->text('access_token');
             $table->text('refresh_token');
@@ -24,6 +24,8 @@ class Tokens extends Migration
             $table->string('character_owner_hash');
             $table->softDeletes();
             $table->timestamps();
+            $table->index('character_id');
+            $table->index('user_id');
         });
     }
 

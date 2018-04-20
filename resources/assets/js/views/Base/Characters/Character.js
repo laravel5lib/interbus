@@ -24,7 +24,7 @@ class Character extends Component {
     }
 
     loadFromServer(){
-        axios.get('http://interbus.test/api/characters/' + this.props.match.params.id)
+        axios.get('/api/characters/' + this.props.match.params.id)
             .then(res => {
                 const character = res.data;
                 this.setState({

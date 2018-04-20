@@ -4482,12 +4482,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:tristanpollard/esiclient.git",
-                "reference": "5d32b2afae087241e0e2bb04dc1db59178764014"
+                "reference": "1e778a2162645820aa6317b261ee551b488775bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tristanpollard/esiclient/zipball/5d32b2afae087241e0e2bb04dc1db59178764014",
-                "reference": "5d32b2afae087241e0e2bb04dc1db59178764014",
+                "url": "https://api.github.com/repos/tristanpollard/esiclient/zipball/1e778a2162645820aa6317b261ee551b488775bd",
+                "reference": "1e778a2162645820aa6317b261ee551b488775bd",
                 "shasum": ""
             },
             "require": {
@@ -4521,7 +4521,7 @@
                 "source": "https://github.com/tristanpollard/esiclient/tree/master",
                 "issues": "https://github.com/tristanpollard/esiclient/issues"
             },
-            "time": "2018-04-19T06:01:04+00:00"
+            "time": "2018-04-20T04:35:52+00:00"
         },
         {
             "name": "tymon/jwt-auth",
