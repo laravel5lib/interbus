@@ -60,8 +60,9 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - 13:45:42:a9:87:b8:8c:1b:61:01:ac:42:17:2f:83:11
+            - 2c:2b:8c:d1:3a:30:59:10:41:c6:d4:a6:a6:d8:34:df
       - run: yum install -y openssh-server openssh-clients
-      - run: ssh -oStrictHostKeyChecking=no interbus@staging.interbus.space 'cd /var/www/interbus && git fetch origin && git pull'
+      - run: ssh -oStrictHostKeyChecking=no interbus@staging.interbus.space 'cd /var/www/interbus && git fetch origin && git pull && composer install && yarn production'
 
 workflows:
   version: 2
