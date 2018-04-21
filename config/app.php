@@ -161,15 +161,18 @@ return [
         App\Providers\RouteServiceProvider::class,
     ],
 
-    'authenticatedJobs' => [
+    'authenticated_jobs' => [
         'character' => [
             \App\Jobs\Character\CharacterAttributesJob::class,
             \App\Jobs\Character\CharacterBlueprintsJob::class,
             \App\Jobs\Character\CharacterChatChannelsJob::class,
             \App\Jobs\Character\CharacterClonesJob::class,
             \App\Jobs\Character\CharacterContactsJob::class,
+            \App\Jobs\Character\CharacterContractsJob::class,
             \App\Jobs\Character\CharacterFatigueJob::class,
+            \App\Jobs\Character\CharacterMailsJob::class,
             \App\Jobs\Character\CharacterMedalsJob::class,
+            \App\Jobs\Character\CharacterMiningJob::class,
             \App\Jobs\Character\CharacterNotificationsJob::class,
             \App\Jobs\Character\CharacterRolesJob::class,
             \App\Jobs\Character\CharacterSkillQueueJob::class,
@@ -178,13 +181,12 @@ return [
             \App\Jobs\Character\CharacterTitlesJob::class,
             \App\Jobs\Character\CharacterWalletBalanceJob::class,
             \App\Jobs\Character\CharacterWalletJournalJob::class,
-            \App\Jobs\Character\CharacterMiningJob::class,
         ],
         'corporation' => [
 
         ]
     ],
-    'publicJobs' => [
+    'public_jobs' => [
         'character' => [
             \App\Jobs\Character\CharacterUpdateJob::class
         ],

@@ -22,16 +22,21 @@ class CharacterMedalsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->getId()}/medals");
         $medals = $response->get('result');
 
-        foreach ($medals as $medal){
-            $medal['date'] = Carbon::parse($medal['date']);
-            $medal = collect($medal);
-            $graphics = $medal->pull('graphics');
-            CharacterMedal::updateOrCreate([
-                'character_id' => $this->getId(),
-                'medal_id' => $medal['medal_id']
-            ], $medal->toArray()
-            )->touch();
-        }
+        DB::transaction(function ($db) use ($medals) {
+            $medalIds = $medals->pluck('medal_id');
+            CharacterMedal::whereNotIn('medal_id', $medalIds)->where('character_id', $this->getId())->delete();
+
+            foreach ($medals as $medal) {
+                $medal['date'] = Carbon::parse($medal['date']);
+                $medal = collect($medal);
+                $graphics = $medal->pull('graphics');
+                CharacterMedal::updateOrCreate([
+                    'character_id' => $this->getId(),
+                    'medal_id' => $medal['medal_id']
+                ], $medal->toArray()
+                )->touch();
+            }
+        });
 
         $this->logFinished();
     }

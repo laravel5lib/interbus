@@ -21,7 +21,8 @@ Horizon::auth(function ($request) {
 
 Route::get('/test', function (){
     $token = \App\Models\Token::first();
-    dispatch(new \App\Jobs\Character\CharacterMiningJob($token))->onConnection('sync');
+    dispatch(new \App\Jobs\Character\CharacterTitlesJob($token))->onConnection('sync');
+    return [];
 });
 
 Route::view('/tokens/{code}', 'welcome')->name('ssocallbackcode');

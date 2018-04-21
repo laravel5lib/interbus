@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Character\Character;
 use App\Models\Scope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,10 @@ class Token extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function character() {
+        return $this->belongsTo(Character::class, 'character_id', 'character_id');
+    }
 
     public function scopes(){
         return $this->hasMany(Scope::class, 'token');

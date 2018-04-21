@@ -16,7 +16,7 @@ class CreateCharacterChatChannelsTable extends Migration
         Schema::create('character_chat_channels', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('character_id');
-            $table->integer('channel_id');
+            $table->bigInteger('channel_id');
             $table->string('name');
             $table->integer('owner_id');
             $table->string('comparison_key');

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\AllianceUpdateJob;
+use App\Jobs\Alliance\AllianceUpdateJob;
 use App\Models\Alliance\Alliance;
 use Illuminate\Console\Command;
 use tristanpollard\ESIClient\Services\ESIClient;

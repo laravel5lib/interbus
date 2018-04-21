@@ -28,13 +28,15 @@ class CharacterSkillsJob extends AuthenticatedESIJob
         $totalSp = $skills->get('total_sp');
         $unallocatedSp = $skills->get('unallocated_sp');
         $skills = $skills->get('skills');
-
-        foreach ($skills as $skill){
-            CharacterSkill::updateOrCreate([
-                'character_id' => $this->token->character_id, 'skill_id' => $skill['skill_id']
-            ], $skill
-            )->touch();
-        }
+        DB::transaction(function ($db) use ($skills) {
+            foreach ($skills as $skill) {
+                CharacterSkill::updateOrCreate([
+                    'character_id' => $this->token->character_id,
+                    'skill_id' => $skill['skill_id']
+                ], $skill
+                )->touch();
+            }
+        });
 
         $this->logFinished();
 

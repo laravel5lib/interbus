@@ -22,13 +22,16 @@ class CharacterNotificationsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->getId()}/notifications");
         $notifications = $response->get('result');
 
-        foreach ($notifications as $notification){
-            $notification['timestamp'] = Carbon::parse($notification['timestamp']);
-            CharacterNotification::updateOrCreate([
-                'character_id' => $this->getId(), 'notification_id' => $notification['notification_id'],
-            ], $notification
-            )->touch();
-        }
+        DB::transaction(function ($db) use ($notifications) {
+            foreach ($notifications as $notification) {
+                $notification['timestamp'] = Carbon::parse($notification['timestamp']);
+                CharacterNotification::updateOrCreate([
+                    'character_id' => $this->getId(),
+                    'notification_id' => $notification['notification_id'],
+                ], $notification
+                )->touch();
+            }
+        });
 
         $this->logFinished();
     }

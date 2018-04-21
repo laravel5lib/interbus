@@ -22,16 +22,23 @@ class CharacterClonesJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->token->character_id}/clones");
 
         $clones = $response->get('result');
-        if (!empty($clones['jump_clones'])) {
-            foreach ($clones['jump_clones'] as $clone) {
-                $clone = collect($clone);
-                $implants = $clone->pull('implants');
 
-                CharacterClone::updateOrCreate([
-                    'character_id' => $this->token->character_id, 'jump_clone_id' => $clone->get('jump_clone_id')],
-                    $clone->toArray()
-                )->touch();
-            }
+        if (!empty($clones['jump_clones'])) {
+            DB::transaction(function ($db) use ($clones) {
+                $clones = collect($clones['jump_clones']);
+                CharacterClone::whereNotIn('jump_clone_id', $clones)->where('character_id', $this->getId())->delete();
+                foreach ($clones as $clone) {
+                    $clone = collect($clone);
+                    $implants = $clone->pull('implants');
+
+                    CharacterClone::updateOrCreate([
+                        'character_id' => $this->token->character_id,
+                        'jump_clone_id' => $clone->get('jump_clone_id')
+                    ],
+                        $clone->toArray()
+                    )->touch();
+                }
+            });
         }
 
         $this->logFinished();

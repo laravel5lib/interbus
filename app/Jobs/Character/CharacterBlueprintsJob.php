@@ -3,8 +3,8 @@
 namespace App\Jobs\Character;
 
 use App\Models\Character\CharacterBlueprints;
-use tristanpollard\ESIClient\Services\ESIClient;
 use App\Jobs\AuthenticatedESIJob;
+use Illuminate\Support\Facades\DB;
 
 class CharacterBlueprintsJob extends AuthenticatedESIJob
 {
@@ -22,17 +22,20 @@ class CharacterBlueprintsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->token->character_id}/blueprints");
         $blueprints = $response->get('result');
 
-        //TODO remove all old BP's.
+        DB::transaction(function ($db) use ($blueprints) {
+            $itemIds = $blueprints->pluck('item_id');
+            CharacterBlueprints::whereNotIn('item_id', $itemIds)->where('character_id', $this->getId())->delete();
 
-        foreach ($blueprints as $blueprint){
-            CharacterBlueprints::updateOrCreate(
-                [
-                    'character_id' => $this->token->character_id,
-                    'item_id' => $blueprint['item_id']
-                ],
-                $blueprint
-            )->touch();
-        }
+            foreach ($blueprints as $blueprint) {
+                CharacterBlueprints::updateOrCreate(
+                    [
+                        'character_id' => $this->getId(),
+                        'item_id' => $blueprint['item_id']
+                    ],
+                    $blueprint
+                )->touch();
+            }
+        });
 
         $this->logFinished();
     }

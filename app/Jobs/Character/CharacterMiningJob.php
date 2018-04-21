@@ -25,11 +25,13 @@ class CharacterMiningJob extends AuthenticatedESIJob
                 ]
             ]);
             $pages = $mining->get('headers')['X-Pages'][0];
-            foreach ($mining->get('result') as $entry) {
-                CharacterMining::updateOrCreate( array_merge(['character_id' => $this->getId()], $entry),
-                    []
-                );
-            }
+            DB::transaction(function ($db) use ($mining) {
+                foreach ($mining->get('result') as $entry) {
+                    CharacterMining::updateOrCreate(array_merge(['character_id' => $this->getId()], $entry),
+                        []
+                    );
+                }
+            });
         }
 
         $this->logFinished();

@@ -47,13 +47,15 @@ class CharacterWalletJournalJob extends AuthenticatedESIJob
             dispatch(new CorporationUpdateJob($corp));
         }
 
-        foreach ($journal as $entry) {
-            $entry['date'] = Carbon::parse($entry['date']);
-            unset($entry['extra_info']);
-            CharacterJournalEntry::updateOrCreate(['ref_id' => $entry['ref_id']],
-                $entry
-            );
-        }
+        DB::transaction(function ($db) use ($journal) {
+            foreach ($journal as $entry) {
+                $entry['date'] = Carbon::parse($entry['date']);
+                unset($entry['extra_info']);
+                CharacterJournalEntry::updateOrCreate(['ref_id' => $entry['ref_id']],
+                    $entry
+                );
+            }
+        });
 
         $this->logFinished();
     }

@@ -21,12 +21,15 @@ class CharacterStandingsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->getId()}/standings");
         $standings = $response->get('result');
 
-        foreach ($standings as $standing){
-            CharacterStanding::updateOrCreate([
-                'character_id' => $this->getId(), 'from_id' => $standing['from_id']
-            ], $standing
-            )->touch();
-        }
+        DB::transaction(function ($db) use ($standings) {
+            foreach ($standings as $standing) {
+                CharacterStanding::updateOrCreate([
+                    'character_id' => $this->getId(),
+                    'from_id' => $standing['from_id']
+                ], $standing
+                )->touch();
+            }
+        });
 
         $this->logFinished();
     }

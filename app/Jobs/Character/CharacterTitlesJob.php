@@ -22,14 +22,16 @@ class CharacterTitlesJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->token->character_id}/titles");
         $titles = $response->get('result');
 
-        //TODO remove old titles
-
-        foreach ($titles as $title){
-            CharacterTitles::updateOrCreate(
-                [ 'character_id' => $this->token->character_id, 'title_id' => $title['title_id']],
-                $title
-            )->touch();
-        }
+        DB::transaction(function ($db) use ($titles) {
+            $titleIds = $titles->pluck('title_id');
+            CharacterTitles::whereNotIn('title_id', $titleIds)->where('character_id', $this->getId())->delete();
+            foreach ($titles as $title) {
+                CharacterTitles::updateOrCreate(
+                    ['character_id' => $this->token->character_id, 'title_id' => $title['title_id']],
+                    $title
+                )->touch();
+            }
+        });
 
         $this->logFinished();
     }

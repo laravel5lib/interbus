@@ -39,15 +39,18 @@ class CharacterContactsJob extends AuthenticatedESIJob{
         $unknownAlliances = Alliance::whereIn('alliance_id', $allianceIds)->get();
         $unknownAlliances = $allianceIds->diff($unknownAlliances->pluck('alliance_id'));
 
-        foreach ($contacts as $contact){
-            CharacterContact::updateOrCreate([
-                'owner_id' => $this->getId(),
-                'contact_id' => $contact['contact_id']
-            ], $contact
-            )->touch();
-        }
+        DB::transaction(function ($db) use ($contacts) {
+            $allIds = $contacts->pluck('contact_id');
+            CharacterContact::whereNotIn('owner_id', $allIds)->where('character_id', $this->getId())->delete();
 
-        CharacterContact::where('owner_id', $this->getId())->whereNotIn('contact_id', $contacts->pluck('contact_id'))->delete();
+            foreach ($contacts as $contact) {
+                CharacterContact::updateOrCreate([
+                    'owner_id' => $this->getId(),
+                    'contact_id' => $contact['contact_id']
+                ], $contact
+                )->touch();
+            }
+        });
 
         foreach ($unknownChars as $char){
             dispatch(new CharacterUpdateJob($char));

@@ -33,10 +33,19 @@ class AuthenticatedCharacterUpdateQueuer implements ShouldQueue
     public function handle()
     {
         $authenticatedCharacterJobs = config('app.authenticatedJobs.character');
+        $unauthenticatedCharacterJobs = config('app.public_jobs.character');
 
-        foreach ($authenticatedCharacterJobs as $authenticatedCharacterJob){
+        foreach ($authenticatedCharacterJobs as $authenticatedCharacterJob) {
             /** @var AuthenticatedESIJob $job */
             $job = new $authenticatedCharacterJob($this->token);
+            if ($job->shouldDispatch()) {
+                dispatch($job);
+            }
+        }
+
+        foreach ($unauthenticatedCharacterJobs as $unauthenticatedCharacterJob) {
+            /** @var PublicESIJob $job */
+            $job = new $unauthenticatedCharacterJob($this->token->character_id);
             if ($job->shouldDispatch()) {
                 dispatch($job);
             }
