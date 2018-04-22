@@ -34,7 +34,7 @@ class CharacterMedalsJob extends AuthenticatedESIJob
                     'character_id' => $this->getId(),
                     'medal_id' => $medal['medal_id']
                 ], $medal->toArray()
-                )->touch();
+                );
             }
         });
 

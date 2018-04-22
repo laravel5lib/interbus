@@ -34,7 +34,7 @@ class CharacterSkillsJob extends AuthenticatedESIJob
                     'character_id' => $this->token->character_id,
                     'skill_id' => $skill['skill_id']
                 ], $skill
-                )->touch();
+                );
             }
         });
 

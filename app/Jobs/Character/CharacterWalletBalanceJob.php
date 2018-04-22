@@ -28,7 +28,7 @@ class CharacterWalletBalanceJob extends AuthenticatedESIJob{
         CharacterWalletBalance::updateorCreate([
             'character_id' => $this->getId()
             ], $wallet
-        )->touch();
+        );
 
         $this->logFinished();
     }

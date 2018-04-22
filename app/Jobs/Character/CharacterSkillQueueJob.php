@@ -46,7 +46,7 @@ class CharacterSkillQueueJob extends AuthenticatedESIJob
                     'skill_id' => $skill['skill_id'],
                     'finished_level' => $skill['finished_level']
                 ], $skill
-                )->touch();
+                );
             }
 
             $queueModel->delete();

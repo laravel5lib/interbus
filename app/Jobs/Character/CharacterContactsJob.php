@@ -48,7 +48,7 @@ class CharacterContactsJob extends AuthenticatedESIJob{
                     'owner_id' => $this->getId(),
                     'contact_id' => $contact['contact_id']
                 ], $contact
-                )->touch();
+                );
             }
         });
 

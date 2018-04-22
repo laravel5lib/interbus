@@ -29,7 +29,7 @@ class CharacterNotificationsJob extends AuthenticatedESIJob
                     'character_id' => $this->getId(),
                     'notification_id' => $notification['notification_id'],
                 ], $notification
-                )->touch();
+                );
             }
         });
 

@@ -21,8 +21,9 @@ Horizon::auth(function ($request) {
 
 Route::get('/test', function (){
     $token = \App\Models\Token::first();
-    dispatch(new \App\Jobs\Character\CharacterTitlesJob($token))->onConnection('sync');
-    return [];
+    $char = $token->character_id;
+    //return \App\Models\Character\CharacterJournalEntry::whereNotNull('first_party_id')->doesntHave('firstParty')->get();
+    dispatch(new \App\Jobs\Character\CharacterMailsJob($token))->onConnection('sync');
 });
 
 Route::view('/tokens/{code}', 'welcome')->name('ssocallbackcode');

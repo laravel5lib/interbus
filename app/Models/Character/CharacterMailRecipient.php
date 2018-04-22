@@ -11,4 +11,8 @@ class CharacterMailRecipient extends Model
     public function mail() {
         return $this->belongsTo(CharacterMail::class, 'mail_id', 'mail_id');
     }
+
+    public function recipient() {
+        return $this->morphTo();
+    }
 }

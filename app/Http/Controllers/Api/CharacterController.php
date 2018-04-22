@@ -13,31 +13,26 @@ class CharacterController extends Controller
 {
 
     public function getCharacters(Request $request) {
-
-        $perPage = $request->get('itemsPerPage') ?? 20;
-        $offset = $request->get('offset') ?? 0;
-        $chars = \App\Models\Character\Character::orderBy('name',
-            'asc')->limit($perPage)->offset($offset)->with('corporation')->with('alliance');
+        $chars = \App\Models\Character\Character::with('corporation', 'alliance');
 
         if ($request->get('q') && strlen($request->get('q')) >= 3) {
             $chars->where('name', 'LIKE', "%{$request->get('q')}%");
-            $count = \App\Models\Character\Character::where('name', 'LIKE', "%{$request->get('q')}%")->count();
-        } else {
-            $count = \App\Models\Character\Character::count();
         }
 
-        $chars = $chars->get();
-        return [
-            'data' => $chars,
-            'count' => $count
-        ];
+        return $chars->paginate(15);
     }
 
-    public function getCharacter($id) {
-        $char = \App\Models\Character\Character::where('character_id', $id)
-            ->with(['alliance', 'corporation'])->firstOrFail();
+    public function getCharacterClones(Character $character) {
+        return $character->clones()->get();
+    }
 
-        return $char;
+    public function getCharacterChatChannels(Character $character) {
+        return $character->chatChannels()->with('owner')->get();
+    }
+
+    public function getCharacter(Character $character) {
+        $character->load('corporation', 'alliance');
+        return $character;
     }
 
     public function getCharacterOnline(Character $character, ESIClient $client) {
@@ -56,85 +51,29 @@ class CharacterController extends Controller
     }
 
     public function getCharacterSkills(Character $character) {
-        return $character->skills()->with('skillType')->get();
+        return $character->skills()->with('skillType', 'skillType.group')->get();
     }
 
-    public function getCharacterFatigue(Character $id) {
-        return $id->fatigue()->first();
+    public function getCharacterFatigue(Character $character) {
+        return $character->fatigue()->first();
     }
 
-    public function getCharacterContacts($id) {
-        $contacts = \App\Models\Character\Character::findOrFail($id)->contacts()->orderBy('standing', 'desc')->get();
-
-        $chars = $contacts->where('contact_type', 'character')->pluck('contact_id');
-        $corps = $contacts->where('contact_type', 'corporation')->pluck('contact_id');
-        $alliances = $contacts->where('contact_type', 'alliance')->pluck('contact_id');
-
-        $chars = Character::whereIn('character_id', $chars)->get();
-        $corps = Corporation::whereIn('corporation_id', $corps)->get();
-        $alliances = Alliance::whereIn('alliance_id', $alliances)->get();
-
-        foreach ($contacts as $contact) {
-            switch ($contact['contact_type']) {
-                case 'character':
-                    $contact['contact'] = $chars->firstWhere('character_id', $contact['contact_id']);
-                    break;
-                case 'corporation':
-                    $contact['contact'] = $corps->firstWhere('corporation_id', $contact['contact_id']);
-                    break;
-                case 'alliance':
-                    $contact['contact'] = $alliances->firstWhere('alliance_id', $contact['contact_id']);
-                    break;
-            }
-        }
-
+    public function getCharacterContacts(Character $character) {
+        $contacts = $character->contacts()->with('contact')->get();
         return $contacts;
     }
 
-    function getCharacterJournal($id) {
-        $journal = \App\Models\Character\CharacterJournalEntry::where('first_party_id', $id)->orWhere('second_party_id', $id)->get()->keyBy('ref_id');
+    function getCharacterMail(Character $character) {
+        return $character->mails()->with('sender')->get();
+    }
 
-        $first = $journal->where('first_party_id', '!=', null)->pluck('first_party_type', 'first_party_id');
-        $second = $journal->where('second_party_id', '!=', null)->pluck('second_party_type', 'second_party_id');
-        $ids = $first->union($second);
+    function getCharacterJournal(Character $character) {
+        $journal = \App\Models\Character\CharacterJournalEntry::where('first_party_id', $character->character_id)
+            ->orWhere('second_party_id', $character->character_id)
+            ->with('firstParty', 'secondParty')
+            ->get();
 
-        $chars = $ids->filter(function ($key, $value) {
-            if ($key === 'character') {
-                return true;
-            }
-            return false;
-        });
-
-        $corps = $ids->filter(function ($key, $value) {
-           if ($key === 'corporation') {
-               return true;
-           }
-           return false;
-        });
-
-        $corps = Corporation::whereIn('corporation_id', $corps->keys())->get();
-        $chars = Character::whereIn('character_id', $chars->keys())->get();
-
-        foreach ($journal as $entry) {
-            $first = $entry['first_party_id'];
-            $firstType = $entry['first_party_type'];
-            $second = $entry['second_party_id'];
-            $secondType = $entry['second_party_type'];
-
-            if ($firstType === 'character') {
-                $entry['first_party'] = $chars->firstWhere('character_id', $first);
-            } else if ($firstType === 'corporation') {
-                $entry['first_party'] = $corps->firstWhere('corporation_id', $first);
-            }
-
-            if ($secondType === 'character') {
-                $entry['second_party'] = $chars->firstWhere('character_id', $second);
-            } else if ($secondType === 'corporation') {
-                $entry['second_party'] = $corps->firstWhere('corporation_id', $second);
-            }
-        }
-
-        return $journal->values();
+        return $journal;
     }
 
 }

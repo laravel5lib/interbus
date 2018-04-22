@@ -8,6 +8,8 @@ import JournalTable from '../../../components/JournalTable/JournalTable';
 import SkillsTable from '../../../components/SkillsTable/SkillsTable';
 import TitlesTable from '../../../components/TitlesTable/TitlesTable';
 import RolesTable from '../../../components/RolesTable/RolesTable';
+import MailTable from '../../../components/MailTable/MailTable';
+import ChatChannelsTable from '../../../components/ChatChannelsTables/ChatChannelsTable';
 
 import classnames from 'classnames';
 
@@ -16,11 +18,33 @@ class Character extends Component {
     constructor(props) {
         super(props);
 
+        console.log(this.props.location);
+
+        this.didChange = false;
+
         this.state = {
             character: null,
             activeTab: 'Sheet',
             loadedTabs: [],
         };
+    }
+
+    componentWillUpdate(nextProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
+            this.didChange = true;
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.didChange) {
+            this.setState({
+                character: null,
+                activeTab: 'Sheet',
+                loadedTabs: [],
+            });
+            this.loadFromServer();
+            this.didChange = false;
+        }
     }
 
     loadFromServer(){
@@ -70,6 +94,20 @@ class Character extends Component {
                             </NavItem>
                             <NavItem>
                                 <NavLink
+                                    className={classnames({ active: this.state.activeTab === 'Chat' })}
+                                    onClick={() => { this.toggle('Chat'); }} >
+                                    Chat Channels
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
+                                    className={classnames({ active: this.state.activeTab === 'Clones' })}
+                                    onClick={() => { this.toggle('Clones'); }} >
+                                    Clones
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
                                     className={classnames({ active: this.state.activeTab === 'Contacts' })}
                                     onClick={() => { this.toggle('Contacts'); }} >
                                     Contacts
@@ -80,6 +118,13 @@ class Character extends Component {
                                     className={classnames({ active: this.state.activeTab === 'Journal' })}
                                     onClick={() => { this.toggle('Journal'); }} >
                                     Journal
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
+                                    className={classnames({ active: this.state.activeTab === 'Mail' })}
+                                    onClick={() => { this.toggle('Mail'); }} >
+                                    Mail
                                 </NavLink>
                             </NavItem>
                             <NavItem>
@@ -109,6 +154,18 @@ class Character extends Component {
                                 <TabPane tabId="Sheet">
                                     Test
                                 </TabPane>
+                                {(this.state.activeTab === 'Chat' || this.state.loadedTabs.indexOf('Chat') !== -1) &&
+                                <TabPane tabId="Chat">
+                                    <ChatChannelsTable id={this.state.character.character_id}
+                                                   key={this.state.character.character_id}/>
+                                </TabPane>
+                                }
+                                {(this.state.activeTab === 'Clones' || this.state.loadedTabs.indexOf('Clones') !== -1) &&
+                                <TabPane tabId="Clones">
+                                    <ClonesTable id={this.state.character.character_id}
+                                                       key={this.state.character.character_id}/>
+                                </TabPane>
+                                }
                                 {(this.state.activeTab === 'Contacts' || this.state.loadedTabs.indexOf('Contacts') !== -1) &&
                                 <TabPane tabId="Contacts">
                                     <ContactsTable id={this.state.character.character_id}
@@ -119,6 +176,12 @@ class Character extends Component {
                                 <TabPane tabId="Journal">
                                     <JournalTable id={this.state.character.character_id}
                                                    key={this.state.character.character_id}/>
+                                </TabPane>
+                                }
+                                {(this.state.activeTab === 'Mail' || this.state.loadedTabs.indexOf('Mail') !== -1) &&
+                                <TabPane tabId="Mail">
+                                    <MailTable id={this.state.character.character_id}
+                                                  key={this.state.character.character_id}/>
                                 </TabPane>
                                 }
                                 {(this.state.activeTab === 'Skills' || this.state.loadedTabs.indexOf('Skills') !== -1) &&

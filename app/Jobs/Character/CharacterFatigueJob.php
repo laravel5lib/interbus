@@ -30,7 +30,7 @@ class CharacterFatigueJob extends AuthenticatedESIJob
         CharacterFatigue::updateOrCreate(
             ['character_id' => $this->token->character_id],
             $fatigue->toArray()
-        )->touch();
+        );
 
         $this->logFinished();
     }

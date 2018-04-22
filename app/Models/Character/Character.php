@@ -28,9 +28,14 @@ class Character extends Model
         return $this->hasMany(CharacterContact::class, 'owner_id');
     }
 
-    public function contactOf()
+    public function chatChannels()
     {
-        return $this->hasMany(CharacterContact::class, 'contact_id');
+        return $this->hasMany(CharacterChatChannel::class, 'character_id');
+    }
+
+    public function clones()
+    {
+        return $this->hasMany(CharacterClone::class, 'character_id', 'character_id');
     }
 
     public function roles()
@@ -69,6 +74,15 @@ class Character extends Model
     public function walletBalance()
     {
         return $this->hasOne(CharacterWalletBalance::class, 'character_id');
+    }
+
+    public function contactOf()
+    {
+        return $this->morphMany(CharacterContact::class, 'contact');
+    }
+
+    public function mailRecipients() {
+        return $this->morphMany(CharacterMailRecipient::class, 'recipient');
     }
 
 }

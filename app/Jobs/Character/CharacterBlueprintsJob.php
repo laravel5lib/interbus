@@ -33,7 +33,7 @@ class CharacterBlueprintsJob extends AuthenticatedESIJob
                         'item_id' => $blueprint['item_id']
                     ],
                     $blueprint
-                )->touch();
+                );
             }
         });
 

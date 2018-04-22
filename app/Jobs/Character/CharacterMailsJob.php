@@ -31,6 +31,7 @@ class CharacterMailsJob extends AuthenticatedESIJob
 
         $mails = $this->getClient()->invoke('/characters/' . $this->getId() . '/mail')->get('result');
 
+        //TODO optimize this....
         while ( $mails->count() > 0 ){
 
             $mailIds = $mailIds->merge($mails->pluck('mail_id'));

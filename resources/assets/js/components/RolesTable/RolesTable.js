@@ -25,7 +25,7 @@ class RolesTable extends Component{
         const characterId = this.props.id;
         axios.get('/api/characters/' + characterId + '/roles')
             .then( res => {
-                const roles = res.data;
+                const roles = _.orderBy(res.data, ['location', 'role'], ['desc', 'asc']);
                 this.setState({
                     roles: roles
                 });

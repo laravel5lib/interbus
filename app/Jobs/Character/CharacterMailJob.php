@@ -41,7 +41,7 @@ class CharacterMailJob extends AuthenticatedESIJob
             $recipients = collect($mail->pull('recipients'));
             $labels = $mail->pull('labels');
 
-            $mail->put('timestamp', Carbon::parse($mail->get('timestmap')));
+            $mail->put('timestamp', Carbon::parse($mail->get('timestamp')));
 
             CharacterMail::updateOrCreate( ['mail_id' => $this->mail] ,
                 $mail->toArray()

@@ -24,7 +24,7 @@
         "jsonwebtoken": "^8.2.0",
         "jwt-decode": "auth0/jwt-decode",
         "laravel-mix": "^2.0",
-        "lodash": "^4.17.4",
+        "lodash": "^4.17.5",
         "popper.js": "^1.14.1",
         "react": "^16.2.0",
         "react-chartjs-2": "2.7.0",

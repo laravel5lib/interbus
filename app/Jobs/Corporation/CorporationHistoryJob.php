@@ -34,7 +34,7 @@ class CorporationHistoryJob extends PublicESIJob{
            CorporationHistory::updateOrCreate([
                'corporation_id' => $this->getId(), 'record_id' => $history['record_id'],
                ], $history
-           )->touch();
+           );
         }
 
         $this->logFinished();

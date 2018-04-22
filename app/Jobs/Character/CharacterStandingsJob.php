@@ -27,7 +27,7 @@ class CharacterStandingsJob extends AuthenticatedESIJob
                     'character_id' => $this->getId(),
                     'from_id' => $standing['from_id']
                 ], $standing
-                )->touch();
+                );
             }
         });
 

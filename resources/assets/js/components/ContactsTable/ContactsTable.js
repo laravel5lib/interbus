@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
+import { Link } from 'react-router-dom';
+
 import { Table, Col } from 'reactstrap';
 import { RingLoader } from 'react-spinners';
+import {history} from '../../helpers/history';
 
 class ContactsTable extends Component{
 
@@ -25,12 +28,17 @@ class ContactsTable extends Component{
         const characterId = this.props.id;
         axios.get('/api/characters/' + characterId + '/contacts')
             .then( res => {
-               const contacts = res.data;
+               const contacts = _.orderBy(res.data, ['standing', 'contact.name'], ['desc', 'asc']);
                this.setState({
                    contacts: contacts,
                    loading: false
                });
             });
+    }
+
+    redirect = (event, type, id) => {
+        event.preventDefault();
+        history.push('/' + type + 's/' +id);
     }
 
     render() {
@@ -47,14 +55,14 @@ class ContactsTable extends Component{
                     return (
                         <tr>
                             <td>
-                                <a href={'/' + contact.contact_type + 's/' + contact.contact_id}>{contact.contact.name}</a>
+                                <Link to={'/' + contact.contact_type + 's/' + contact.contact_id} >{contact.contact.name}</Link>
                             </td>
                             <td>
                                 {contact.standing}
                             </td>
                         </tr>
                     )
-                })}
+                }, this)}
                 </tbody>
 
                 <RingLoader

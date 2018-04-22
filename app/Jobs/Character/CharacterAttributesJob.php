@@ -35,7 +35,7 @@ class CharacterAttributesJob extends AuthenticatedESIJob
         CharacterAttributes::updateOrCreate([
             'character_id' => $this->token->character_id
         ], $attributes->toArray()
-        )->touch();
+        );
 
         $this->logFinished();
     }

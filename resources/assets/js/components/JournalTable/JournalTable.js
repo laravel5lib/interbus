@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 
 import { Table } from 'reactstrap';
 
+import { Link } from 'react-router-dom';
+
 class JournalTable extends Component{
 
 
@@ -25,7 +27,7 @@ class JournalTable extends Component{
         const characterId = this.props.id;
         axios.get('/api/characters/' + characterId + '/journal')
             .then( res => {
-                const entries = res.data;
+                const entries = _.orderBy(res.data, ['date'], ['desc']);
                 this.setState({
                     journal: entries
                 });
@@ -40,6 +42,7 @@ class JournalTable extends Component{
                     <th>Sender</th>
                     <th>Receiver</th>
                     <th>Amount</th>
+                    <th>Date</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -47,17 +50,20 @@ class JournalTable extends Component{
                     return (
                         <tr>
                             <td>
-                                <a href={ ( entry.first_party_type === 'character' ? "/characters/" : '/corporation/') + entry.first_party_id}>
+                                <Link to={ ( entry.first_party_type === 'character' ? "/characters/" : '/corporation/') + entry.first_party_id}>
                                     { entry.first_party ? entry.first_party.name : entry.first_party_id }
-                                </a>
+                                </Link>
                             </td>
                             <td>
-                                <a href={ ( entry.second_party_type === 'character' ? "/characters/" : '/corporation/') + entry.second_party_id}>
+                                <Link to={ ( entry.second_party_type === 'character' ? "/characters/" : '/corporation/') + entry.second_party_id}>
                                     { entry.second_party ? entry.second_party.name : entry.second_party_id }
-                                    </a>
+                                    </Link>
                             </td>
                             <td>
                                 { Math.abs(entry.amount).toLocaleString() }
+                            </td>
+                            <td>
+                                { entry.date }
                             </td>
                         </tr>
                     )

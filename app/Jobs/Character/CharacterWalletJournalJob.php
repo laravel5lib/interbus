@@ -7,6 +7,7 @@ use App\Jobs\Corporation\CorporationUpdateJob;
 use App\Models\Character\Character;
 use App\Models\Character\CharacterJournalEntry;
 use App\Models\Corporation\Corporation;
+use App\Models\Token;
 use Carbon\Carbon;
 
 class CharacterWalletJournalJob extends AuthenticatedESIJob
@@ -14,6 +15,13 @@ class CharacterWalletJournalJob extends AuthenticatedESIJob
 
     protected $scope = 'esi-wallet.read_character_wallet.v1';
 
+    protected $from;
+
+    public function __construct(Token $token, int $from = null)
+    {
+        parent::__construct($token);
+        $this->from = $from;
+    }
 
     /**
      * Execute the job.
@@ -25,7 +33,11 @@ class CharacterWalletJournalJob extends AuthenticatedESIJob
         $this->logStart();
 
         $client = $this->getClient();
-        $response = $client->invoke("/characters/{$this->getId()}/wallet/journal");
+        $params = [];
+        if ($this->from) {
+            $params['from_id'] = $this->from;
+        }
+        $response = $client->invoke("/characters/{$this->getId()}/wallet/journal", $params);
         $journal = collect($response->get('result'));
 
         $chars = $journal->where('first_party_type', 'character')->pluck('first_party_id');
@@ -59,4 +71,5 @@ class CharacterWalletJournalJob extends AuthenticatedESIJob
 
         $this->logFinished();
     }
+
 }

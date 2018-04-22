@@ -90,15 +90,18 @@ Route::get('/ssourl', function (\tristanpollard\ESIClient\Services\SSO $sso) {
     return $sso->generateSSOUrl();
 });
 
+Route::get('/chat/{channel}', 'Api\ChatController@getChatChannel');
+Route::get('/characters/{character}/clones', 'Api\CharacterController@getCharacterClones');
+Route::get('/characters/{character}/chat', 'Api\CharacterController@getCharacterChatChannels');
 Route::get('/characters/{character}/mail', 'Api\CharacterController@getcharacterMail');
 Route::get('/characters/{character}/roles', 'Api\CharacterController@getCharacterRoles');
 Route::get('/characters/{character}/titles', 'Api\CharacterController@getCharacterTitles');
 Route::get('/characters/{character}/online', 'Api\CharacterController@getCharacterOnline');
 Route::get('/characters/{character}/skills', 'Api\CharacterController@getCharacterSkills');
-Route::get('/characters/{id}/fatigue', 'Api\CharacterController@getCharacterFatigue');
-Route::get('/characters/{id}/journal', 'Api\CharacterController@getCharacterJournal');
-Route::get('/characters/{id}/contacts', 'Api\CharacterController@getCharacterContacts');
-Route::get('/characters/{id}', 'Api\CharacterController@getCharacter');
+Route::get('/characters/{character}/fatigue', 'Api\CharacterController@getCharacterFatigue');
+Route::get('/characters/{character}/journal', 'Api\CharacterController@getCharacterJournal');
+Route::get('/characters/{character}/contacts', 'Api\CharacterController@getCharacterContacts');
+Route::get('/characters/{character}', 'Api\CharacterController@getCharacter');
 Route::get('/characters', 'Api\CharacterController@getCharacters');
 
 Route::get('/stats', function () {

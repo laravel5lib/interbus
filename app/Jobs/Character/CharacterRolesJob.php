@@ -42,7 +42,7 @@ class CharacterRolesJob extends AuthenticatedESIJob{
                     CharacterRoles::updateOrCreate(
                         ['character_id' => $this->token->character_id, 'role' => $role, 'location' => $location],
                         []
-                    )->touch();
+                    );
                 }
             }
         });

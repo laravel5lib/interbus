@@ -42,7 +42,6 @@ class CharacterChatChannelsJob extends AuthenticatedESIJob
                     'channel_id' => $channel['channel_id']
                 ], $channel->toArray()
                 );
-                $channel->touch();
 
                 $this->updateAllowed($channel, $allowed);
                 $this->updateOperators($channel, $operators);
@@ -64,7 +63,7 @@ class CharacterChatChannelsJob extends AuthenticatedESIJob
                 'accessor_id' => $allow['accessor_id']
             ],
                 $allow
-            )->touch();
+            );
         }
     }
 
@@ -78,7 +77,7 @@ class CharacterChatChannelsJob extends AuthenticatedESIJob
                 'accessor_id' => $operator['accessor_id']
             ],
                 $operator
-            )->touch();
+            );
         }
     }
 

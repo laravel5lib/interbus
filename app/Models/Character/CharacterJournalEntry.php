@@ -9,4 +9,12 @@ class CharacterJournalEntry extends Model
     public $primaryKey = 'ref_id';
 
     protected $guarded = [];
+
+    public function firstParty() {
+        return $this->morphTo();
+    }
+
+    public function secondParty() {
+        return $this->morphTo();
+    }
 }

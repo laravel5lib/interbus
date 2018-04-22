@@ -2,6 +2,7 @@
 
 namespace App\Models\Corporation;
 
+use App\Models\Character\CharacterMailRecipient;
 use Illuminate\Database\Eloquent\Model;
 
 class Corporation extends Model
@@ -23,4 +24,7 @@ class Corporation extends Model
         return $this->hasMany(CorporationHistory::class, 'corporation_id');
     }
 
+    public function mailRecipients() {
+        return $this->morphMany(CharacterMailRecipient::class, 'recipient');
+    }
 }

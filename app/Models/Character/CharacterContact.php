@@ -11,11 +11,11 @@ class CharacterContact extends Model
 
     protected $guarded = [];
 
-    public function contactOwner(){
+    public function contactOwner() {
         return $this->belongsTo(Character::class, 'character_id', 'owner_id');
     }
 
-    public function character(){
-        return $this->belongsTo(Character::class, 'contact_id', 'character_id');
+    public function contact() {
+        return $this->morphTo();
     }
 }

@@ -29,7 +29,7 @@ class CharacterTitlesJob extends AuthenticatedESIJob
                 CharacterTitles::updateOrCreate(
                     ['character_id' => $this->token->character_id, 'title_id' => $title['title_id']],
                     $title
-                )->touch();
+                );
             }
         });
 

@@ -14,7 +14,6 @@ class CreateCharacterChatChannelsTable extends Migration
     public function up()
     {
         Schema::create('character_chat_channels', function (Blueprint $table) {
-            $table->increments('id');
             $table->bigInteger('character_id');
             $table->bigInteger('channel_id');
             $table->string('name');
@@ -24,6 +23,7 @@ class CreateCharacterChatChannelsTable extends Migration
             $table->text('motd');
             $table->softDeletes();
             $table->timestamps();
+            $table->primary('channel_id');
             $table->index('character_id');
         });
     }

@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CharacterChatChannel extends Model
 {
-
     use SoftDeletes;
+
+    public $primaryKey = 'channel_id';
 
     protected $guarded = [];
 
@@ -26,6 +27,10 @@ class CharacterChatChannel extends Model
 
     public function operators() {
         return $this->hasMany(CharacterChatChannelsOperators::class, 'channel_id', 'channel_id');
+    }
+
+    public function owner() {
+        return $this->belongsTo(Character::class, 'owner_id', 'character_id');
     }
 
 }

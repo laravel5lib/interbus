@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
-import { Table } from 'reactstrap';
+import { Table, Card, CardHeader } from 'reactstrap';
+
+import { Link } from 'react-router-dom';
 
 class SkillsTable extends Component{
 
@@ -12,7 +14,8 @@ class SkillsTable extends Component{
         super(props);
 
         this.state = {
-            skills: []
+            skills: [],
+            keys: [],
         };
     }
 
@@ -25,43 +28,57 @@ class SkillsTable extends Component{
         const characterId = this.props.id;
         axios.get('/api/characters/' + characterId + '/skills')
             .then( res => {
-                const skills = res.data.sort(function (a, b) {
-                    if (a.skill_type.name < b.skill_type.name)
-                        return -1;
-                    if (a.skill_type.name > b.skill_type.name)
-                        return 1;
-                    return 0;
+                const skills = _.groupBy(res.data, 'skill_type.group.name');
+
+                let sortedSkills = {};
+
+                Object.keys(skills).map(function (key) {
+                    const sorted = skills[key].sort(function (a, b) {
+                        if (a.skill_type.name < b.skill_type.name)
+                            return -1;
+                        if (a.skill_type.name > b.skill_type.name)
+                            return 1;
+                        return 0;
+                    });
+                    sortedSkills[key] = sorted;
                 });
+
                 this.setState({
-                    skills: skills
+                    skills: sortedSkills,
+                    keys: Object.keys(skills).sort(),
                 });
             });
     }
 
     render() {
         return (
-            <Table responsive>
-                <thead>
-                <tr>
-                    <th>Skill</th>
-                    <th>Level</th>
-                </tr>
-                </thead>
-                <tbody>
-                { this.state.skills.map(function (skill) {
+            <div>
+                { this.state.keys.map(function (key) {
                     return (
-                        <tr>
-                            <td>
-                                <a href={'/types/' + skill.skill_id}>{skill.skill_type.name}</a>
-                            </td>
-                            <td>
-                                {skill.trained_skill_level}
-                            </td>
-                        </tr>
+                        <Card key={key}>
+                            <CardHeader>
+                                <i className="fa fa-align-justify"></i> {key}
+                            </CardHeader>
+                        <Table responsive>
+                            <tbody>
+                            {this.state.skills[key].map(function (skill) {
+                                return (
+                                    <tr key={skill.skill_id}>
+                                        <td>
+                                            <Link to={'/types/' + skill.skill_id}>{skill.skill_type.name}</Link>
+                                        </td>
+                                        <td>
+                                            {skill.trained_skill_level}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                            </tbody>
+                        </Table>
+                        </Card>
                     )
-                })}
-                </tbody>
-            </Table>
+                }, this)}
+            </div>
         )
     }
 }

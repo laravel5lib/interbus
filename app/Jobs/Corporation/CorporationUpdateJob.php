@@ -29,7 +29,7 @@ class CorporationUpdateJob extends PublicESIJob{
         Corporation::updateOrCreate(
             ['corporation_id' => $this->getId()],
             $result->toArray()
-        )->touch();
+        );
 
         dispatch(new CorporationHistoryJob($this->id));
 

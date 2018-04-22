@@ -2,6 +2,7 @@
 
 namespace App\Models\Alliance;
 
+use App\Models\Character\CharacterMailRecipient;
 use Illuminate\Database\Eloquent\Model;
 
 class Alliance extends Model
@@ -19,4 +20,7 @@ class Alliance extends Model
         return $this->hasMany(Corporation::class, 'alliance_id');
     }
 
+    public function mailRecipients() {
+        return $this->morphMany(CharacterMailRecipient::class, 'recipient');
+    }
 }

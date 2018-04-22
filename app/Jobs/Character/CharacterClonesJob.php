@@ -36,7 +36,7 @@ class CharacterClonesJob extends AuthenticatedESIJob
                         'jump_clone_id' => $clone->get('jump_clone_id')
                     ],
                         $clone->toArray()
-                    )->touch();
+                    );
                 }
             });
         }

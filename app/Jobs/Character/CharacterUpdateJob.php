@@ -31,7 +31,6 @@ class CharacterUpdateJob extends PublicESIJob{
             ['character_id' => $this->getId()],
             $response->toArray()
         );
-        $character->touch();
 
         if (!$character->corporation()->first()){
             dispatch(new CorporationUpdateJob($character->corporation_id));

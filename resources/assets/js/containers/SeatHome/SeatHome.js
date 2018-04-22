@@ -43,6 +43,10 @@ class SeatHome extends Component {
                                 <Route path="/characters" name="Characters" component={Characters}/>
                                 <Route path="/tokens/:code" name="Tokens" component={Tokens}/>
                                 <Route path="/tokens" name="Tokens" component={Tokens}/>
+                                <Route path={"/chat"} name={"Chat"} component={Characters}/>
+                                <Route path={"/chat/:id"} name={"Chat Channel"} component={Character}/>
+                                <Route path={"/types"} name={"Types"} component={Characters} />
+                                <Route path={"/types/:id"} name={"Type"} component={Character} />
                                 <Redirect from="/" to="/dashboard"/>
                             </Switch>
                         </Container>

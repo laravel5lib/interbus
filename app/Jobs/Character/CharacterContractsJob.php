@@ -43,7 +43,7 @@ class CharacterContractsJob extends AuthenticatedESIJob
                 CharacterContract::updateOrCreate([
                     'contract_id' => $contract['contract_id']
                 ], $contract
-                )->touch();
+                );
             }
         });
 
