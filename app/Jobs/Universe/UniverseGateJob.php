@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Universe;
 
+use App\Jobs\PublicESIJob;
 use App\Models\Universe\UniverseGate;
 use App\Models\Universe\UniverseGateDestination;
 use Illuminate\Support\Facades\DB;

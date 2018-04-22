@@ -45,7 +45,7 @@ class UpdateSystems extends Command
         $systems = $this->client->invoke('/universe/systems')->get('result');
 
         foreach ($systems as $system) {
-            dispatch(new UpdateSystemJob($system))->onConnection('sync');
+            dispatch(new UpdateSystemJob($system));
         }
     }
 }

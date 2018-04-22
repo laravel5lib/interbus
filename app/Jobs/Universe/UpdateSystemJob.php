@@ -20,10 +20,6 @@ class UpdateSystemJob extends PublicESIJob
 
         $system = $client->invoke('/universe/systems/' . $this->getId())->get('result');
 
-        //TODO stargates
-        //TODO stations
-        //TODO planets
-
         $stations = $system->pull('stations');
         $gates = $system->pull('stargates');
         $planets = collect($system->pull('planets'));
@@ -53,8 +49,11 @@ class UpdateSystemJob extends PublicESIJob
             dispatch(new UniverseGateJob($gate));
         }
 
-        foreach ($stations as $station) {
-            dispatch(new UniverseStationJob($station));
+        //Some systems have no stations
+        if ($stations) {
+            foreach ($stations as $station) {
+                dispatch(new UniverseStationJob($station));
+            }
         }
 
         UniverseSystem::updateOrCreate(['system_id' => $this->getId()],

@@ -61,7 +61,7 @@ jobs:
           fingerprints:
             - 13:45:42:a9:87:b8:8c:1b:61:01:ac:42:17:2f:83:11
       - run: yum install -y openssh-server openssh-clients
-      - run: ssh -oStrictHostKeyChecking=no interbus@staging.interbus.space 'cd /var/www/interbus && php artisan down && git fetch origin && git pull && composer install && yarn install && yarn production && php artisan migrate && php artisan cache:clear && php artisan config:cache && php artisan view:cache && php artisan horizon:terminate && php artisan up'
+      - run: ssh -oStrictHostKeyChecking=no interbus@staging.interbus.space 'cd /var/www/interbus && php artisan down && git fetch origin && git pull && composer install && yarn install && php artisan migrate && php artisan cache:clear && php artisan config:cache && php artisan view:cache && php artisan horizon:terminate && php artisan up'
 
   deploy-production:
     docker:
