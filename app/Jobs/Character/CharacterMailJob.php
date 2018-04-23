@@ -38,40 +38,30 @@ class CharacterMailJob extends AuthenticatedESIJob
             ->get('result');
 
         DB::transaction(function ($db) use ($mail) {
+            $from_type = 'character';
             $recipients = collect($mail->pull('recipients'));
             $labels = $mail->pull('labels');
 
             $mail->put('timestamp', Carbon::parse($mail->get('timestamp')));
-
-            CharacterMail::updateOrCreate( ['mail_id' => $this->mail] ,
-                $mail->toArray()
-            );
-            //$characterMail->recipients()->createMany($recipients);
+            //TODO make more efficient...
             foreach ($recipients as $recipient) {
+                if ($recipient['recipient_type'] === 'mailing_list' && $recipient['recipient_id'] === $mail['from']) {
+                    $from_type = 'mailing_list';
+                }
                 CharacterMailRecipient::updateOrCreate(['recipient_id' => 'recipient_id', 'mail_id' => $this->mail],
                     $recipient
                 );
             }
+
+            CharacterMail::updateOrCreate( ['mail_id' => $this->mail],
+                array_merge($mail->toArray(), ['from_type' => $from_type] )
+            );
 
             $charIds = $recipients->where('recipient_type', 'character')->pluck('recipient_id');
             $knownChars = Character::select('character_id')->whereIn('character_id', $charIds)->get()->pluck('character_id');
             $unknownChars = $charIds->diff($knownChars);
             foreach ($unknownChars as $char) {
                 dispatch(new CharacterUpdateJob($char));
-            }
-
-            $corpIds = $recipients->where('recipient_type', 'corporation')->pluck('recipient_id');
-            $knownCorps = Corporation::select('corporation_id')->whereIn('corporation_id_id', $corpIds)->get()->pluck('corporation_id');
-            $unknownCorps = $charIds->diff($knownCorps);
-            foreach ($unknownCorps as $corp) {
-                dispatch(new CorporationUpdateJob($corp));
-            }
-
-            $allianceIds = $recipients->where('recipient_type', 'alliance')->pluck('recipient_id');
-            $knownAlliances = Alliance::select('alliance_id')->whereIn('alliance_id', $allianceIds)->get()->pluck('alliance_id');
-            $unknownAlliances = $charIds->diff($knownAlliances);
-            foreach ($unknownAlliances as $alliance) {
-                dispatch(new AllianceUpdateJob($alliance));
             }
 
         });

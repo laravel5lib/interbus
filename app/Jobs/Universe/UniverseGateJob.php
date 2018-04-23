@@ -25,14 +25,8 @@ class UniverseGateJob extends PublicESIJob
 
         DB::transaction(function ($db) use ($gate) {
 
-            $destination = ['stargate_id' => $this->getId()];
-
             foreach ($gate->pull('destination') as $key => $value) {
-                $destination['destination_' . $key] = $value;
-            }
-
-            if (count($destination) > 1) {
-                UniverseGateDestination::updateOrCreate($destination, []);
+                $gate->put('destination_' . $key, $value);
             }
 
             UniverseGate::updateOrCreate(['stargate_id' => $this->getId()], $gate->toArray());

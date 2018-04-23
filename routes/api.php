@@ -91,6 +91,9 @@ Route::get('/ssourl', function (\tristanpollard\ESIClient\Services\SSO $sso) {
 });
 
 Route::get('/chat/{channel}', 'Api\ChatController@getChatChannel');
+Route::get('/characters/{character}/assets', 'Api\CharacterController@getCharacterAssets');
+Route::get('/characters/{character}/attributes', 'Api\CharacterController@getCharacterAttributes');
+Route::get('/characters/{character}/queue', 'Api\CharacterController@getCharacterSkillQueue');
 Route::get('/characters/{character}/clones', 'Api\CharacterController@getCharacterClones');
 Route::get('/characters/{character}/chat', 'Api\CharacterController@getCharacterChatChannels');
 Route::get('/characters/{character}/mail', 'Api\CharacterController@getcharacterMail');

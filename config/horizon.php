@@ -72,31 +72,34 @@ return [
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
-                'connection' => 'redis',
-                'queue' => ['default'],
-                'balance' => 'simple',
-                'processes' => 8,
-                'tries' => 3,
-            ],
-        ],
-        'dev' => [
-            'supervisor-1' => [
-                'connection' => 'redis',
-                'queue' => ['default'],
-                'balance' => 'simple',
-                'processes' => 16,
-                'tries' => 3,
-            ],
-        ],
-        'local' => [
-            'supervisor-1' => [
+            'interbus-supervisor-main' => [
                 'connection' => 'redis',
                 'queue' => ['default'],
                 'balance' => 'simple',
                 'processes' => 1,
-                'tries' => 3,
+                'tries' => 1,
+                'timeout' => 60,
             ],
+        ],
+        'dev' => [
+            'interbus-supervisor-main' => [
+                'connection' => 'redis',
+                'queue' => ['default'],
+                'balance' => 'simple',
+                'processes' => 16,
+                'tries' => 1,
+                'timeout' => 60,
+            ],
+        ],
+        'local' => [
+            'interbus-supervisor-main' => [
+                'connection' => 'redis',
+                'queue' => ['default'],
+                'balance' => 'simple',
+                'processes' => 2,
+                'tries' => 1,
+                'timeout' => 60,
+            ]
         ],
     ],
 ];

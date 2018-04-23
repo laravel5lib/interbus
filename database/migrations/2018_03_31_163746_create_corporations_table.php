@@ -30,6 +30,7 @@ class CreateCorporationsTable extends Migration
             $table->bigInteger('shares')->nullable();
             $table->timestamps();
             $table->primary('corporation_id');
+            $table->index('alliance_id');
         });
     }
 

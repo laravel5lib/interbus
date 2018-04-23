@@ -5,8 +5,11 @@ namespace App\Console\Commands;
 use App\Jobs\Alliance\AllianceUpdateJob;
 use App\Jobs\Character\CharacterUpdateJob;
 use App\Jobs\Corporation\CorporationUpdateJob;
+use App\Jobs\Universe\UniverseGateJob;
 use App\Models\Character\CharacterJournalEntry;
+use App\Models\Character\CharacterMail;
 use App\Models\Character\CharacterMailRecipient;
+use App\Models\Universe\UniverseGate;
 use Illuminate\Console\Command;
 
 class AssociateUnknown extends Command
@@ -32,6 +35,14 @@ class AssociateUnknown extends Command
      */
     public function handle()
     {
+        $senders = CharacterMail::where('from_type', 'character')->doesntHave('sender')->get();
+        foreach ($senders as $sender) {
+            dispatch(new CharacterUpdateJob($sender));
+        }
+        $this->info(count($senders) . ' Mail Senders Queued');
+
+        return;
+
         //Yea so this doesn't work at all...
         $recipients = CharacterMailRecipient::whereNotIn('recipient_type', ['mailing_list'])->doesntHave('recipient')->get();
         $this->dispatchFromType($recipients, 'recipient');

@@ -27,6 +27,7 @@ class CreateCharactersSkillQueueTable extends Migration
             $table->softDeletes();
             $table->timestamps();
             $table->index('character_id');
+            $table->index('finished_level');
         });
     }
 

@@ -26,6 +26,7 @@ class CharacterContractsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->token->character_id}/contracts");
         $contracts = $response->get('result');
 
+        //Todo make more efficient
         DB::transaction(function ($db) use($contracts) {
             foreach ($contracts as $contract) {
 

@@ -59,15 +59,33 @@ class CharacterWalletJournalJob extends AuthenticatedESIJob
             dispatch(new CorporationUpdateJob($corp));
         }
 
-        DB::transaction(function ($db) use ($journal) {
-            foreach ($journal as $entry) {
-                $entry['date'] = Carbon::parse($entry['date']);
-                unset($entry['extra_info']);
-                CharacterJournalEntry::updateOrCreate(['ref_id' => $entry['ref_id']],
-                    $entry
-                );
+        $knownEntries = CharacterJournalEntry::select('ref_id')->whereIn('ref_id', $journal->pluck('ref_id'))
+        ->get()->pluck('ref_id');
+        $esiEntries = $journal->pluck('ref_id');
+        $unknownEntries = $esiEntries->diff($knownEntries);
+
+        $updateEntries = $journal->whereIn('ref_id', $unknownEntries);
+        $time = Carbon::now();
+        $keys = collect();
+        $updateEntries = $updateEntries->map(function ($entry) use ($time, $keys){
+            $item = array_merge($entry, ['created_at' => $time, 'updated_at' => $time, 'date' => Carbon::parse($entry['date'])]);
+            unset($item['extra_info']);
+            foreach (array_keys($item) as $key) {
+                if (!$keys->contains($key)) {
+                    $keys->push($key);
+                }
             }
+            foreach ($keys as $key) {
+                if (!isset($item[$key])) {
+                    $item[$key] = null;
+                }
+            }
+            return $item;
         });
+
+        if ($updateEntries->count()) {
+            CharacterJournalEntry::insert($updateEntries->toArray());
+        }
 
         $this->logFinished();
     }

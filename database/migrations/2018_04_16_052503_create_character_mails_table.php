@@ -17,6 +17,7 @@ class CreateCharacterMailsTable extends Migration
             $table->bigInteger('mail_id');
             $table->string('subject')->nullable();
             $table->bigInteger('from')->nullable();
+            $table->string('from_type')->nullable();
             $table->dateTime('timestamp')->nullable();
             $table->text('body')->nullabe();
             $table->boolean('read')->nullable();

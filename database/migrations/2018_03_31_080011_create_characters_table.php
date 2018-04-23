@@ -28,6 +28,8 @@ class CreateCharactersTable extends Migration
            $table->integer('faction_id')->nullable();
            $table->timestamps();
            $table->primary('character_id');
+           $table->index('corporation_id');
+           $table->index('alliance_id');
         });
     }
 

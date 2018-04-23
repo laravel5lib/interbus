@@ -21,7 +21,12 @@ class CreateCharacterMiningsTable extends Migration
             $table->bigInteger('type_id');
             $table->bigInteger('quantity');
             $table->timestamps();
+            //Yea I hate ccp. Legit need every fucking column to uniquely identify....
             $table->index('character_id');
+            $table->index('solar_system_id');
+            $table->index('date');
+            $table->index('type_id');
+            $table->index('quantity');
         });
     }
 

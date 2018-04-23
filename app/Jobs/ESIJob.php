@@ -19,6 +19,8 @@ abstract class ESIJob implements ShouldQueue
 
     protected $uid;
 
+    public $tries = 1;
+
     public function __construct()
     {
         $this->uid = uniqid('job_');

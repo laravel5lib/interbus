@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
             'alliance' => Alliance::class,
             'station' => UniverseStation::class,
             'structure' => UniverseStructure::class,
+            'other' => UniverseStructure::class,
         ]);
     }
 

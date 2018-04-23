@@ -22,10 +22,12 @@ class CharacterBlueprintsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->token->character_id}/blueprints");
         $blueprints = $response->get('result');
 
+
         DB::transaction(function ($db) use ($blueprints) {
             $itemIds = $blueprints->pluck('item_id');
             CharacterBlueprints::whereNotIn('item_id', $itemIds)->where('character_id', $this->getId())->delete();
 
+            //TODO make this more efficient (remove foreach and mass insert)
             foreach ($blueprints as $blueprint) {
                 CharacterBlueprints::updateOrCreate(
                     [

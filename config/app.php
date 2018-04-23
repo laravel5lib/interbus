@@ -159,11 +159,14 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        \App\Providers\DiscordWebhookProvider::class,
     ],
 
     'authenticated_jobs' => [
         'character' => [
             \App\Jobs\Character\CharacterAttributesJob::class,
+            \App\Jobs\Character\CharacterAssetsJob::class,
             \App\Jobs\Character\CharacterBlueprintsJob::class,
             \App\Jobs\Character\CharacterChatChannelsJob::class,
             \App\Jobs\Character\CharacterClonesJob::class,
@@ -192,6 +195,13 @@ return [
         ],
         'corporation' => [
 
+        ],
+        'universe' => [
+            \App\Jobs\Universe\UniverseAsteroidBeltJob::class,
+            \App\Jobs\Universe\UniverseGateJob::class,
+            \App\Jobs\Universe\UniverseMoonJob::class,
+            \App\Jobs\Universe\UniversePlanetJob::class,
+            \App\Jobs\Universe\UniverseStationJob::class,
         ]
     ],
 

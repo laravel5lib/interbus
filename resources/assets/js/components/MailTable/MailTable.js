@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { Table } from 'reactstrap';
+import ReactPaginate from 'react-paginate';
+
+import { Link } from 'react-router-dom';
 
 class MailTable extends Component{
 
@@ -12,25 +15,39 @@ class MailTable extends Component{
         super(props);
 
         this.state = {
-            mail: []
+            mail: [],
+            page: 1,
+            totalPages: 1
         };
     }
 
     componentDidMount() {
-        this.loadContacts();
+        this.loadMail();
     }
 
 
-    loadContacts() {
+    loadMail() {
         const characterId = this.props.id;
-        axios.get('/api/characters/' + characterId + '/mail')
+        axios.get('/api/characters/' + characterId + '/mail',{
+            params: {
+                page: this.state.page
+            }
+        })
             .then( res => {
-                const mail = _.orderBy(res.data, 'timestamp', 'desc');
+                const mail = res.data.data;
                 this.setState({
-                    mail: mail
+                    mail: mail,
+                    totalPages: res.data.last_page
                 });
             });
     }
+
+    handlePageClick = (data) => {
+        let selected = data.selected;
+        this.setState({ page: selected }, () => {
+            this.loadMail();
+        });
+    };
 
     render() {
         return (
@@ -45,14 +62,26 @@ class MailTable extends Component{
                 <tbody>
                 { this.state.mail.map(function (mail) {
                     return (
-                        <tr>
-                            <td>{ mail.sender ? mail.sender.name : 'Unknown' }</td>
+                        <tr key={mail.mail_id}>
+                            <td><Link to={"/characters/" +  mail.from}>{ mail.sender ? mail.sender.name : 'Unknown' }</Link></td>
                             <td>{ mail.subject }</td>
                             <td>{ mail.timestamp }</td>
                         </tr>
                     )
                 })}
                 </tbody>
+
+                <ReactPaginate previousLabel={"previous"}
+                               nextLabel={"next"}
+                               breakLabel={<a href="">...</a>}
+                               breakClassName={"break-me"}
+                               pageCount={this.state.totalPages}
+                               marginPagesDisplayed={2}
+                               pageRangeDisplayed={5}
+                               onPageChange={this.handlePageClick}
+                               containerClassName={"pagination"}
+                               subContainerClassName={"pages pagination"}
+                               activeClassName={"active"} />
             </Table>
         )
     }

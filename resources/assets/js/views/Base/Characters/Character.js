@@ -10,6 +10,9 @@ import TitlesTable from '../../../components/TitlesTable/TitlesTable';
 import RolesTable from '../../../components/RolesTable/RolesTable';
 import MailTable from '../../../components/MailTable/MailTable';
 import ChatChannelsTable from '../../../components/ChatChannelsTables/ChatChannelsTable';
+import ClonesTable from '../../../components/ClonesTable/ClonesTable';
+import SkillQueueTable from '../../../components/SkillQueueTable/SkillQueueTable';
+import CharacterSheetTable from '../../../components/CharacterSheetTable/CharacterSheetTable';
 
 import classnames from 'classnames';
 
@@ -42,13 +45,14 @@ class Character extends Component {
                 activeTab: 'Sheet',
                 loadedTabs: [],
             });
-            this.loadFromServer();
+            this.loadCharacter();
             this.didChange = false;
         }
     }
 
-    loadFromServer(){
-        axios.get('/api/characters/' + this.props.match.params.id)
+    loadCharacter(){
+        const character = this.props.match.params.id;
+        axios.get('/api/characters/' + character)
             .then(res => {
                 const character = res.data;
                 this.setState({
@@ -58,7 +62,7 @@ class Character extends Component {
     }
 
     componentDidMount() {
-        this.loadFromServer();
+        this.loadCharacter();
     }
 
     toggle = tab => {
@@ -129,6 +133,13 @@ class Character extends Component {
                             </NavItem>
                             <NavItem>
                                 <NavLink
+                                    className={classnames({ active: this.state.activeTab === 'SkillQueue' })}
+                                    onClick={() => { this.toggle('SkillQueue'); }} >
+                                    Skill Queue
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
                                     className={classnames({ active: this.state.activeTab === 'Skills' })}
                                     onClick={() => { this.toggle('Skills'); }} >
                                     Skills
@@ -152,7 +163,8 @@ class Character extends Component {
                         {this.state.character &&
                             <TabContent activeTab={this.state.activeTab}>
                                 <TabPane tabId="Sheet">
-                                    Test
+                                    <CharacterSheetTable character={this.state.character}
+                                                       key={this.state.character.character_id}/>
                                 </TabPane>
                                 {(this.state.activeTab === 'Chat' || this.state.loadedTabs.indexOf('Chat') !== -1) &&
                                 <TabPane tabId="Chat">
@@ -182,6 +194,12 @@ class Character extends Component {
                                 <TabPane tabId="Mail">
                                     <MailTable id={this.state.character.character_id}
                                                   key={this.state.character.character_id}/>
+                                </TabPane>
+                                }
+                                {(this.state.activeTab === 'SkillQueue' || this.state.loadedTabs.indexOf('SkillQueue') !== -1) &&
+                                <TabPane tabId="SkillQueue">
+                                    <SkillQueueTable id={this.state.character.character_id}
+                                                 key={this.state.character.character_id}/>
                                 </TabPane>
                                 }
                                 {(this.state.activeTab === 'Skills' || this.state.loadedTabs.indexOf('Skills') !== -1) &&

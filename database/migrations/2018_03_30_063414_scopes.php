@@ -17,6 +17,7 @@ class Scopes extends Migration
             $table->increments('id');
             $table->integer('token');
             $table->string('scope');
+            $table->index('token');
         });
     }
 

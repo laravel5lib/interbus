@@ -20,18 +20,35 @@ class CharacterNotificationsJob extends AuthenticatedESIJob
 
         $client = $this->getClient();
         $response = $client->invoke("/characters/{$this->getId()}/notifications");
-        $notifications = $response->get('result');
+        $notifications = $response->get('result')->keyBy('notification_id');
 
-        DB::transaction(function ($db) use ($notifications) {
-            foreach ($notifications as $notification) {
-                $notification['timestamp'] = Carbon::parse($notification['timestamp']);
-                CharacterNotification::updateOrCreate([
-                    'character_id' => $this->getId(),
-                    'notification_id' => $notification['notification_id'],
-                ], $notification
-                );
+        $knownNotifications = CharacterNotification::select('notification_id', 'sender_id', 'sender_type', 'timestamp', 'is_read', 'text', 'type')->where('character_id', $this->getId())
+            ->whereIn('notification_id', $notifications->pluck('notification_id'))
+            ->get();
+
+        foreach ($knownNotifications as $knownNotification) {
+            $knownNotification = collect($knownNotification);
+            $knownNotification = $knownNotification->filter(function ($notification){
+                return $notification !== null;
+            });
+            $esiNotification = $notifications[$knownNotification['notification_id']];
+            $esiNotification['timestamp'] = Carbon::parse($esiNotification['timestamp']);
+            $knownNotification['timestamp'] = Carbon::parse($knownNotification['timestamp']);
+            if ($esiNotification == $knownNotification->toArray()) {
+                $knownNotification->fill($esiNotification);
+                $knownNotification->save();
             }
-        });
+            $notifications->forget($knownNotification['notification_id']);
+        }
+
+        if ($notifications->count()) {
+            $time = Carbon::now();
+            $notifications = $notifications->map(function ($notification) use ($time) {
+                $notification['timestamp'] = Carbon::parse($notification['timestamp']);
+               return array_merge(['character_id' => $this->getId(), 'is_read' => null, 'created_at' => $time, 'updated_at' => $time], $notification);
+            });
+            CharacterNotification::insert($notifications->toArray());
+        }
 
         $this->logFinished();
     }

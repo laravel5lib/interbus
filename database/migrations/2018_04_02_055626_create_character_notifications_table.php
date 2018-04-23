@@ -14,9 +14,8 @@ class CreateCharacterNotificationsTable extends Migration
     public function up()
     {
         Schema::create('character_notifications', function (Blueprint $table) {
-            $table->increments('id');
-            $table->bigInteger('character_id');
             $table->bigInteger('notification_id');
+            $table->bigInteger('character_id');
             $table->bigInteger('sender_id');
             $table->string('sender_type');
             $table->dateTime('timestamp');
@@ -24,6 +23,7 @@ class CreateCharacterNotificationsTable extends Migration
             $table->text('text')->nullable();
             $table->string('type');
             $table->timestamps();
+            $table->primary('notification_id');
             $table->index('character_id');
         });
     }

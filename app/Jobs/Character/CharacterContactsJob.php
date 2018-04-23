@@ -9,6 +9,8 @@ use App\Models\Character\Character;
 use App\Models\Character\CharacterContact;
 use App\Models\Corporation\Corporation;
 use App\Jobs\AuthenticatedESIJob;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CharacterContactsJob extends AuthenticatedESIJob{
 
@@ -25,7 +27,7 @@ class CharacterContactsJob extends AuthenticatedESIJob{
         $client = $this->getClient();
 
         $response = $client->invoke("/characters/{$this->getId()}/contacts");
-        $contacts = collect($response['result']);
+        $contacts = collect($response['result'])->keyBy('contact_id');
 
         $charIds = $contacts->where('contact_type', 'character')->pluck('contact_id');
         $unknownChars = Character::whereIn('character_id', $charIds)->get();
@@ -39,18 +41,35 @@ class CharacterContactsJob extends AuthenticatedESIJob{
         $unknownAlliances = Alliance::whereIn('alliance_id', $allianceIds)->get();
         $unknownAlliances = $allianceIds->diff($unknownAlliances->pluck('alliance_id'));
 
-        DB::transaction(function ($db) use ($contacts) {
-            $allIds = $contacts->pluck('contact_id');
-            CharacterContact::whereNotIn('owner_id', $allIds)->where('character_id', $this->getId())->delete();
+        $allIds = $contacts->pluck('contact_id');
+        CharacterContact::whereNotIn('contact_id', $allIds)->where('owner_id', $this->getId())->delete();
 
-            foreach ($contacts as $contact) {
-                CharacterContact::updateOrCreate([
-                    'owner_id' => $this->getId(),
-                    'contact_id' => $contact['contact_id']
-                ], $contact
-                );
+        $existingContacts = CharacterContact::select('id', 'contact_id', 'contact_type', 'standing', 'is_watched', 'label_id')->whereIn('contact_id', $allIds)->where('owner_id', $this->getId())->get();
+        foreach ($existingContacts as $existingContact) {
+            //Strip all null values for comparison...
+            $existingContact = collect($existingContact)->filter(function ($value){
+                return $value !== null;
+            });
+            $esiContact = $contacts[$existingContact['contact_id']];
+            if ( $esiContact != collect($existingContact)->except(['id'])->toArray() ) {
+                $existingContact->fill($esiContact);
+                $existingContact->save();
             }
-        });
+            $contacts->forget($existingContact['contact_id']);
+        }
+
+        if ($contacts->count()) {
+            $contacts = $contacts->map(function ($contact){
+               return array_merge([
+                   'owner_id' => $this->getId(),
+                   'updated_at' => Carbon::now(),
+                   'created_at' => Carbon::now(),
+                   'is_watched' => null,
+                   'label_id' => null
+               ], $contact);
+            });
+            CharacterContact::insert($contacts->toArray());
+        }
 
         foreach ($unknownChars as $char){
             dispatch(new CharacterUpdateJob($char));

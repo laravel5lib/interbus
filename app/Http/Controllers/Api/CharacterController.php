@@ -13,7 +13,7 @@ class CharacterController extends Controller
 {
 
     public function getCharacters(Request $request) {
-        $chars = \App\Models\Character\Character::with('corporation', 'alliance');
+        $chars = \App\Models\Character\Character::with('corporation', 'alliance')->orderBy('name', 'asc');
 
         if ($request->get('q') && strlen($request->get('q')) >= 3) {
             $chars->where('name', 'LIKE', "%{$request->get('q')}%");
@@ -22,8 +22,20 @@ class CharacterController extends Controller
         return $chars->paginate(15);
     }
 
+    public function getCharacterAssets(Character $character) {
+        return $character->assets()->where('location_flag', 'Hangar')->with('name', 'item')->paginate(50);
+    }
+
+    public function getCharacterSkillQueue(Character $character) {
+        return $character->skillQueue()->with('type')->get();
+    }
+
+    public function getCharacterAttributes(Character $character) {
+        return $character->attributes()->first();
+    }
+
     public function getCharacterClones(Character $character) {
-        return $character->clones()->get();
+        return $character->clones()->with('implants', 'implants.type', 'location')->get();
     }
 
     public function getCharacterChatChannels(Character $character) {
@@ -64,7 +76,7 @@ class CharacterController extends Controller
     }
 
     function getCharacterMail(Character $character) {
-        return $character->mails()->with('sender')->get();
+        return $character->mails()->with('sender')->orderBy('timestamp', 'desc')->paginate(15);
     }
 
     function getCharacterJournal(Character $character) {

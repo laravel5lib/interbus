@@ -23,6 +23,14 @@ class Character extends Model
         return $this->belongsTo(Alliance::class, 'alliance_id', 'alliance_id');
     }
 
+    public function assets() {
+        return $this->hasMany(CharacterAsset::class, 'character_id', 'character_id');
+    }
+
+    public function attributes() {
+        return $this->hasMany(CharacterAttributes::class, 'character_id');
+    }
+
     public function contacts()
     {
         return $this->hasMany(CharacterContact::class, 'owner_id');
@@ -35,7 +43,7 @@ class Character extends Model
 
     public function clones()
     {
-        return $this->hasMany(CharacterClone::class, 'character_id', 'character_id');
+        return $this->hasMany(CharacterClone::class, 'character_id');
     }
 
     public function roles()
@@ -51,6 +59,11 @@ class Character extends Model
     public function skills()
     {
         return $this->hasMany(CharacterSkill::class, 'character_id');
+    }
+
+    public function skillQueue()
+    {
+        return $this->hasMany(CharacterSkillQueue::class, 'character_id');
     }
 
     public function titles()

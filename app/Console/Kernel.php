@@ -30,6 +30,7 @@ class Kernel extends ConsoleKernel
     {
         //$schedule->job(new QueueAuthenticatedCharacters())->hourly()->withoutOverlapping();
         $schedule->command('interbus:auth')->hourly()->withoutOverlapping();
+        $schedule->command('horizon:snapshot')->everyFiveMinutes();
     }
 
     /**

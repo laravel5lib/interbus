@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
-import { Table, Col } from 'reactstrap';
+import { Table, Card, CardHeader } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
 
@@ -18,12 +18,12 @@ class ClonesTable extends Component{
     }
 
     componentDidMount() {
-        this.loadContacts();
+        this.loadClones();
     }
 
-    loadContacts() {
+    loadClones() {
         const characterId = this.props.id;
-        axios.get('/api/characters/' + characterId + '/cclones')
+        axios.get('/api/characters/' + characterId + '/clones')
             .then( res => {
                 const clones = res.data
                 this.setState({
@@ -35,28 +35,31 @@ class ClonesTable extends Component{
 
     render() {
         return (
-            <Table responsive>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Owner</th>
-                </tr>
-                </thead>
-                <tbody>
-                {this.state.clones.map(function (channel) {
-                    return (
-                        <tr>
-                            <td>
-                                {/*<Link to={'/chat/' + channel.channel_id}>{channel.name}</Link>*/}
-                            </td>
-                            <td>
-                                {/*<Link to={'/characters/' + channel.owner.character_id}>{channel.owner.name}</Link>*/}
-                            </td>
-                        </tr>
-                    )
-                }, this)}
-                </tbody>
-            </Table>
+            <div>
+            { this.state.clones.map(function (clone) {
+                console.log(clone);
+                return (
+                    <Card key={clone.jump_clone_id}>
+                        <CardHeader>
+                            <i className="fa fa-align-justify"></i> {clone.location ? clone.location.name : 'Unknown'}
+                        </CardHeader>
+                        <Table responsive>
+                            <tbody>
+                            {clone.implants.map(function (implant) {
+                                return (
+                                    <tr key={implant.implant}>
+                                        <td>
+                                            {implant.type.name}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                            </tbody>
+                        </Table>
+                    </Card>
+                )
+            }, this)}
+            </div>
         )
     }
 }
