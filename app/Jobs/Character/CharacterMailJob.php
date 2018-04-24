@@ -37,35 +37,31 @@ class CharacterMailJob extends AuthenticatedESIJob
         $mail = $this->getClient()->invoke('/characters/' . $this->getId() . '/mail/' . $this->mail)
             ->get('result');
 
-        DB::transaction(function ($db) use ($mail) {
-            $from_type = 'character';
-            $recipients = collect($mail->pull('recipients'));
-            $labels = $mail->pull('labels');
+        $from_type = 'character';
+        $recipients = collect($mail->pull('recipients'));
+        $labels = $mail->pull('labels');
 
-            $mail->put('timestamp', Carbon::parse($mail->get('timestamp')));
-            //TODO make more efficient...
-            foreach ($recipients as $recipient) {
-                if ($recipient['recipient_type'] === 'mailing_list' && $recipient['recipient_id'] === $mail['from']) {
-                    $from_type = 'mailing_list';
-                }
-                CharacterMailRecipient::updateOrCreate(['recipient_id' => 'recipient_id', 'mail_id' => $this->mail],
-                    $recipient
-                );
+        $mail->put('timestamp', Carbon::parse($mail->get('timestamp')));
+        //TODO make more efficient...
+        foreach ($recipients as $recipient) {
+            if ($recipient['recipient_type'] === 'mailing_list' && $recipient['recipient_id'] === $mail['from']) {
+                $from_type = 'mailing_list';
             }
-
-            CharacterMail::updateOrCreate( ['mail_id' => $this->mail],
-                array_merge($mail->toArray(), ['from_type' => $from_type] )
+            CharacterMailRecipient::updateOrCreate(['recipient_id' => 'recipient_id', 'mail_id' => $this->mail],
+                $recipient
             );
+        }
 
-            $charIds = $recipients->where('recipient_type', 'character')->pluck('recipient_id');
-            $knownChars = Character::select('character_id')->whereIn('character_id', $charIds)->get()->pluck('character_id');
-            $unknownChars = $charIds->diff($knownChars);
-            foreach ($unknownChars as $char) {
-                dispatch(new CharacterUpdateJob($char));
-            }
+        CharacterMail::updateOrCreate( ['mail_id' => $this->mail],
+            array_merge($mail->toArray(), ['from_type' => $from_type] )
+        );
 
-        });
-
+        $charIds = $recipients->where('recipient_type', 'character')->pluck('recipient_id');
+        $knownChars = Character::select('character_id')->whereIn('character_id', $charIds)->get()->pluck('character_id');
+        $unknownChars = $charIds->diff($knownChars);
+        foreach ($unknownChars as $char) {
+            dispatch(new CharacterUpdateJob($char));
+        }
 
         $this->logFinished();
     }

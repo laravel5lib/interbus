@@ -26,27 +26,25 @@ class CharacterClonesJob extends AuthenticatedESIJob
         $clones = $response->get('result');
 
         if (!empty($clones['jump_clones'])) {
-            DB::transaction(function ($db) use ($clones) {
-                $clones = collect($clones['jump_clones']);
-                CharacterClone::whereNotIn('jump_clone_id', $clones)->where('character_id', $this->getId())->delete();
+            $clones = collect($clones['jump_clones']);
+            CharacterClone::whereNotIn('jump_clone_id', $clones)->where('character_id', $this->getId())->delete();
 
-                //TODO make this more efficient (mass update/insert)
-                foreach ($clones as $clone) {
-                    $clone = collect($clone);
-                    $implants = $clone->pull('implants');
+            //TODO make this more efficient (mass update/insert)
+            foreach ($clones as $clone) {
+                $clone = collect($clone);
+                $implants = $clone->pull('implants');
 
-                    CharacterClone::updateOrCreate([
-                        'character_id' => $this->token->character_id,
-                        'jump_clone_id' => $clone->get('jump_clone_id')
-                    ], $clone->toArray()
-                    );
+                CharacterClone::updateOrCreate([
+                    'character_id' => $this->token->character_id,
+                    'jump_clone_id' => $clone->get('jump_clone_id')
+                ], $clone->toArray()
+                );
 
-                    foreach ($implants as $implant) {
-                        $implantData = ['implant' => $implant, 'clone_id' => $clone->get('jump_clone_id')];
-                        CharacterCloneImplant::updateOrCreate($implantData);
-                    }
+                foreach ($implants as $implant) {
+                    $implantData = ['implant' => $implant, 'clone_id' => $clone->get('jump_clone_id')];
+                    CharacterCloneImplant::updateOrCreate($implantData);
                 }
-            });
+            }
         }
 
         $this->logFinished();

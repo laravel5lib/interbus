@@ -28,27 +28,25 @@ class CharacterChatChannelsJob extends AuthenticatedESIJob
         $response = $client->invoke("/characters/{$this->token->character_id}/chat_channels");
         $result = $response->get('result');
 
-        DB::transaction(function ($db) use ($result) {
-            foreach ($result as $channel) {
-                $channel = collect($channel);
+        foreach ($result as $channel) {
+            $channel = collect($channel);
 
-                $allowed = collect($channel->pull('allowed'));
-                $operators = collect($channel->pull('operators'));
-                $blocked = collect($channel->pull('blocked'));
-                $muted = collect($channel->pull('muted'));
+            $allowed = collect($channel->pull('allowed'));
+            $operators = collect($channel->pull('operators'));
+            $blocked = collect($channel->pull('blocked'));
+            $muted = collect($channel->pull('muted'));
 
-                $channel = CharacterChatChannel::updateOrCreate([
-                    'character_id' => $this->token->character_id,
-                    'channel_id' => $channel['channel_id']
-                ], $channel->toArray()
-                );
+            $channel = CharacterChatChannel::updateOrCreate([
+                'character_id' => $this->token->character_id,
+                'channel_id' => $channel['channel_id']
+            ], $channel->toArray()
+            );
 
-                $this->updateAllowed($channel, $allowed);
-                $this->updateOperators($channel, $operators);
-                $this->updateBlocked($channel, $blocked);
-                $this->updateMuted($channel, $muted);
-            }
-        });
+            $this->updateAllowed($channel, $allowed);
+            $this->updateOperators($channel, $operators);
+            $this->updateBlocked($channel, $blocked);
+            $this->updateMuted($channel, $muted);
+        }
 
         $this->logFinished();
     }

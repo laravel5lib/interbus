@@ -23,14 +23,11 @@ class UniverseGateJob extends PublicESIJob
             $gate->put($key, $pos);
         }
 
-        DB::transaction(function ($db) use ($gate) {
+        foreach ($gate->pull('destination') as $key => $value) {
+            $gate->put('destination_' . $key, $value);
+        }
 
-            foreach ($gate->pull('destination') as $key => $value) {
-                $gate->put('destination_' . $key, $value);
-            }
-
-            UniverseGate::updateOrCreate(['stargate_id' => $this->getId()], $gate->toArray());
-        });
+        UniverseGate::updateOrCreate(['stargate_id' => $this->getId()], $gate->toArray());
 
     }
 }

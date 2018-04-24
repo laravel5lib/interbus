@@ -26,26 +26,24 @@ class CharacterRolesJob extends AuthenticatedESIJob{
         //TODO queue corp jobs
         //Save start time and remove all earlier??
 
-        DB::transaction(function ($db) use ($result) {
-            //Simplest way of deleting
-            //TODO better way to delete?
-            CharacterRoles::where('character_id', $this->getId())->delete();
-            foreach ($result as $key => $roles) {
+        //Simplest way of deleting
+        //TODO better way to delete?
+        CharacterRoles::where('character_id', $this->getId())->delete();
+        foreach ($result as $key => $roles) {
 
-                $location = null;
-                $index = strpos($key, 'roles_at_');
-                if ($index === 0) {
-                    $location = substr($key, strlen('roles_at_'));
-                }
-
-                foreach ($roles as $role) {
-                    CharacterRoles::updateOrCreate(
-                        ['character_id' => $this->token->character_id, 'role' => $role, 'location' => $location],
-                        []
-                    );
-                }
+            $location = null;
+            $index = strpos($key, 'roles_at_');
+            if ($index === 0) {
+                $location = substr($key, strlen('roles_at_'));
             }
-        });
+
+            foreach ($roles as $role) {
+                CharacterRoles::updateOrCreate(
+                    ['character_id' => $this->token->character_id, 'role' => $role, 'location' => $location],
+                    []
+                );
+            }
+        }
 
         $this->logFinished();
     }

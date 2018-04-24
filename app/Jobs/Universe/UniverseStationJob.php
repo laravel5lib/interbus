@@ -22,17 +22,15 @@ class UniverseStationJob extends PublicESIJob
         foreach ($station->pull('position') as $key => $pos) {
             $station->put($key, $pos);
         }
-        DB::transaction(function ($db) use ($station){
-            $services = $station->pull('services');
-            $stationModel = UniverseStation::updateOrCreate(['station_id' => $this->getId()],
-                $station->toArray()
-            );
+        $services = $station->pull('services');
+        $stationModel = UniverseStation::updateOrCreate(['station_id' => $this->getId()],
+            $station->toArray()
+        );
 
-            UniverseStationService::where('station_id', $this->getId())->whereNotIn('service', $services)->delete();
-            foreach ($services as $service) {
-                $serviceData = ['station_id' => $this->getId(), 'service' => $service];
-                UniverseStationService::updateOrCreate($serviceData, []);
-            }
-        });
+        UniverseStationService::where('station_id', $this->getId())->whereNotIn('service', $services)->delete();
+        foreach ($services as $service) {
+            $serviceData = ['station_id' => $this->getId(), 'service' => $service];
+            UniverseStationService::updateOrCreate($serviceData, []);
+        }
     }
 }

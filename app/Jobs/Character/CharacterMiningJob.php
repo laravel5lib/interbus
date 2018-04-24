@@ -27,13 +27,11 @@ class CharacterMiningJob extends AuthenticatedESIJob
 
             $pages = $mining->get('headers')['X-Pages'][0];
             //TODO can this be optimized? CCP doesn't give us a unique key....
-            DB::transaction(function ($db) use ($mining) {
-                foreach ($mining->get('result') as $entry) {
-                    CharacterMining::updateOrCreate(array_merge(['character_id' => $this->getId()], $entry),
-                        []
-                    );
-                }
-            });
+            foreach ($mining->get('result') as $entry) {
+                CharacterMining::updateOrCreate(array_merge(['character_id' => $this->getId()], $entry),
+                    []
+                );
+            }
         }
 
         $this->logFinished();
