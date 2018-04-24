@@ -45,8 +45,11 @@ class UpdateSystemJob extends PublicESIJob
             }
         }
 
-        foreach ($gates as $gate) {
-            dispatch(new UniverseGateJob($gate));
+        //Wormholes have no gates....
+        if ($gates) {
+            foreach ($gates as $gate) {
+                dispatch(new UniverseGateJob($gate));
+            }
         }
 
         //Some systems have no stations
