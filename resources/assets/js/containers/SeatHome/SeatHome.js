@@ -12,6 +12,7 @@ import Stats from '../../views/Base/Stats/Stats';
 import Characters from '../../views/Base/Characters/Characters';
 import Character from '../../views/Base/Characters/Character';
 import Tokens from '../../views/Base/Tokens/Tokens';
+import User from '../../views/Base/User/User';
 import ReduxToastr from 'react-redux-toastr'
 import { connect } from 'react-redux';
 class SeatHome extends Component {
@@ -47,6 +48,7 @@ class SeatHome extends Component {
                                 <Route path={"/chat/:id"} name={"Chat Channel"} component={Character}/>
                                 <Route path={"/types"} name={"Types"} component={Characters} />
                                 <Route path={"/types/:id"} name={"Type"} component={Character} />
+                                <Route path={"/user"} name={"User"} component={User} />
                                 <Redirect from="/" to="/dashboard"/>
                             </Switch>
                         </Container>

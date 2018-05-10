@@ -23,7 +23,7 @@ Route::get('/test', function (){
     $token = \App\Models\Token::first();
     $char = $token->character_id;
     $time = \Carbon\Carbon::now();
-    dispatch(new \App\Jobs\Character\CharacterWalletJournalJob($token))->onConnection('sync');
+    dispatch(new \App\Jobs\Character\CharacterMailsJob($token))->onConnection('sync');
     return \Carbon\Carbon::now()->diffInSeconds($time);
     //return \App\Models\Character\CharacterJournalEntry::whereNotNull('first_party_id')->doesntHave('firstParty')->get();
     //dispatch(new \App\Jobs\Character\CharacterClonesJob($token))->onConnection('sync');
@@ -35,11 +35,9 @@ Route::get('/tokens', function(\Illuminate\Http\Request $request){
     if ($request->has('code')){
         return redirect()->route('ssocallbackcode', ['code' => $request->get('code')]);
     }
-
     return view('welcome');
 })->name('ssocallback');
 
 
 Route::view('/{path?}', 'welcome')
     ->name('react')->where('path', '.*');
-

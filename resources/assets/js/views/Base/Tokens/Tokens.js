@@ -30,11 +30,11 @@ class Tokens extends Component {
     }
 
     loadFromServer(){
-        var query = require('querystring');
-        query = query.stringify( {offset: this.state['offset'], itemsPerPage: this.state['itemsPerPage'], q: this.query})
-        axios.get('/api/tokens?' + query, {
-            headers: {
-                'Authorization' : 'Bearer ' + this.props.user.token
+        axios.get('/api/tokens', {
+            params: {
+                offset: this.state['offset'],
+                itemsPerPage: this.state['itemsPerPage'],
+                q: this.query
             }
         })
             .then(res => {

@@ -7,13 +7,10 @@ function getInitialState(){
     const token = localStorage.getItem('token');
 
     if (token) {
-        const decoded = jwt.decode(token);
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         return {
             loggingIn: false,
-            name: decoded.name,
-            email: decoded.email,
-            expires: decoded.exp,
+            name: 'Sumo',
+            email: 'fireddarksumoh@gmail.com',
             token: token
         }
     }
@@ -22,7 +19,6 @@ function getInitialState(){
         loggingIn: false,
         name: null,
         email: null,
-        expires: null,
         token: null,
     }
 }
@@ -37,14 +33,9 @@ export function user(state = initialState, action) {
                 loggingIn: true
             };
         case userConstants.REFRESH_SUCCESS:
-            let rtoken = jwt.decode(action.user.access_token);
             return{
                 ...state,
                 loggingIn: false,
-                email: rtoken.email,
-                name: rtoken.name,
-                expires: rtoken.exp,
-                token: action.user.access_token,
             };
 
         case userConstants.REFRESH_FAILURE:
@@ -64,14 +55,11 @@ export function user(state = initialState, action) {
             };
 
         case userConstants.LOGIN_SUCCESS:
-            let token = jwt.decode(action.user.access_token);
+            console.log(action);
+            console.log(action.user);
             return {
                 ...state,
                 loggingIn: false,
-                email: token.email,
-                name: token.name,
-                expires: token.exp,
-                token: action.user.access_token,
             };
         case userConstants.LOGIN_FAILURE:
             return {

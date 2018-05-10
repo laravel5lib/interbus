@@ -43,34 +43,34 @@ class ContactsTable extends Component{
 
     render() {
         return (
-            <Table responsive>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Standing</th>
-                </tr>
-                </thead>
-                <tbody>
-                {this.state.contacts.map(function (contact) {
-                    return (
-                        <tr>
-                            <td>
-                                <Link to={'/' + contact.contact_type + 's/' + contact.contact_id} >{contact.contact.name}</Link>
-                            </td>
-                            <td>
-                                {contact.standing}
-                            </td>
-                        </tr>
-                    )
-                }, this)}
-                </tbody>
-
+            <div>
+                <Table responsive>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Standing</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.contacts.map(function (contact) {
+                        return (
+                            <tr>
+                                <td>
+                                    <Link to={'/' + contact.contact_type + 's/' + contact.contact_id} >{contact.contact.name}</Link>
+                                </td>
+                                <td>
+                                    {contact.standing}
+                                </td>
+                            </tr>
+                        )
+                    }, this)}
+                    </tbody>
+                </Table>
                 <RingLoader
                     color={'#123abc'}
                     loading={this.state.loading}
                 />
-
-            </Table>
+            </div>
         )
     }
 }

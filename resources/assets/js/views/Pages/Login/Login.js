@@ -35,7 +35,8 @@ class Login extends Component {
         <Container>
           <Row className="justify-content-center">
             <Col md="8">
-                <Form action="api/auth/login" method="post" encType="multipart/form-data" className="form-horizontal" onSubmit={this.login}>
+
+                <Form action="/login" method="post" encType="multipart/form-data" className="form-horizontal" onSubmit={this.login}>
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>

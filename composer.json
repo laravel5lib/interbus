@@ -29,13 +29,13 @@
         "guzzlehttp/guzzle": "~6.0",
         "laravel/framework": "5.6.*",
         "laravel/horizon": "^1.2",
+        "laravel/passport": "^6.0",
         "laravel/tinker": "^1.0",
         "mrholek/CoreUI-React": "dev-master",
         "mrholek/CoreUI-Vue": "dev-master",
         "predis/predis": "^1.1",
         "symfony/event-dispatcher": "^4.0",
-        "tristanpollard/esi-client": "9999999-dev",
-        "tymon/jwt-auth": "^1.0.0"
+        "tristanpollard/esi-client": "9999999-dev"
     },
     "require-dev": {
         "filp/whoops": "^2.0",

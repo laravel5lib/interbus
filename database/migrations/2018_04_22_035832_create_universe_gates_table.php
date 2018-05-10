@@ -21,8 +21,11 @@ class CreateUniverseGatesTable extends Migration
             $table->double('y');
             $table->double('z');
             $table->bigInteger('system_id');
+            $table->bigInteger('destination_stargate_id');
+            $table->bigInteger('destination_system_id');
             $table->timestamps();
             $table->index('system_id');
+            $table->index('destination_system_id');
         });
     }
 

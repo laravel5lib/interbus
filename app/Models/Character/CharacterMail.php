@@ -17,4 +17,8 @@ class CharacterMail extends Model
     public function sender() {
         return $this->hasOne(Character::class, 'character_id', 'from');
     }
+
+    public function body() {
+        return $this->hasOne(CharacterMailBody::class, 'mail_id', 'mail_id');
+    }
 }

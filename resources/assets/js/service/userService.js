@@ -8,36 +8,22 @@ export const userService = {
 
 function login(email, password) {
 
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    };
-
-    return fetch('/api/auth/login', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                return Promise.reject(response.statusText);
-            }
-
-            return response.json();
+    return axios.post('/api/auth/login',
+        {
+            username: email,
+            password: password,
         })
-        .then(user => {
-            // login successful if there's a jwt token in the response
-            if (user && user.access_token) {
-                // store user details and jwt token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('token', user.access_token)
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.access_token;
-            }
-
-            return user;
+        .then(token => {
+            console.log(token);
+            localStorage.setItem('token', token);
+            return token;
         });
 }
 
 function refresh(){
 
 
-    return axios.post("/api/auth/refresh", {}, {
+    return axios.post("/oauth/token", {}, {
         headers: {
             'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
@@ -50,7 +36,6 @@ function refresh(){
                 if (user && user.access_token) {
                     // store user details and jwt token in local storage to keep user logged in between page refreshes
                     localStorage.setItem('token', user.access_token);
-                    axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.access_token;
                 }
                 return user;
             },

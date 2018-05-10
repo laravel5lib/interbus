@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CharacterMailRecipient extends Model
 {
+    public $timestamps = false;
+
     protected $guarded = [];
 
     public function mail() {

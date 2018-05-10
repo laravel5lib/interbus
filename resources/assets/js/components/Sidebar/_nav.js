@@ -23,6 +23,11 @@ export default {
           name: 'Characters',
           url: '/characters',
           icon: 'icon-speedometer'
+      },
+      {
+          name: 'User',
+          url: '/user',
+          icon: 'icon-speedometer'
       }
   ]
 };
