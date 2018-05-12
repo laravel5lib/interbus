@@ -32,12 +32,14 @@ class CharacterMailsJob extends AuthenticatedESIJob
 
         $params = [];
 
+        // Mails dont use pages.....
         if ($this->lastMailId) {
             $params['query'] = [
                 'last_mail_id' => $this->lastMailId
             ];
         }
 
+        // Fetch all mails before last_mail_id and compare them with mails we don't know about.
         $mails = $this->getClient()->invoke('/characters/' . $this->getId() . '/mail', $params)->get('result')->keyBy('mail_id');
         $mailIds = $mails->pluck('mail_id');
         $knownMails = CharacterMail::select('mail_id')->whereIn('mail_id', $mailIds)->get()->pluck('mail_id');
@@ -45,6 +47,7 @@ class CharacterMailsJob extends AuthenticatedESIJob
             $mails->forget($knownMail);
         }
 
+        // Pull all the recipients, taking into account mailing lists.
         $recipients = $mails->pluck('recipients', 'mail_id');
         $recipients = $recipients->map(function ($recipients, $key) use (&$mails){
             $returnRecips = [];
@@ -61,15 +64,17 @@ class CharacterMailsJob extends AuthenticatedESIJob
         $recipients = $recipients->flatten(1);
         $labels = $mails->pluck('labels');
 
+        // In order to fetch ALL a characters mail we must keep track of what mails we have fetched of theirs
+        // as multiple characters can receive a mail
         $knownCharacterMails = CharacterFetchedMails::select('mail_id')->whereIn('mail_id', $mailIds)->where('character_id', $this->getId())->get()->pluck('mail_id');
         $unknownCharacterMails = $mailIds->diff($knownCharacterMails);
         $unknownCharacterMails = $unknownCharacterMails->map(function ($mail){
             return ['mail_id' => $mail, 'character_id' => $this->getId()];
         });
 
+        // Add the updated at / created at.
         $now = Carbon::now();
         $mails = $mails->map(function ($mail) use ($now){
-
             if (isset($mail['labels'])) {
                 unset($mail['labels']);
             }
@@ -81,6 +86,7 @@ class CharacterMailsJob extends AuthenticatedESIJob
             return array_merge($mail, ['updated_at' => $now, 'created_at' => $now]);
         });
 
+        // Get all the characters, incase we need to update them to.
         $fromChars = $mails->where('from_type', 'character')->pluck('from');
         $recipChars = $recipients->where('recipient_type', 'character')->pluck('recipient_id');
         $chars = collect([]);
@@ -91,6 +97,7 @@ class CharacterMailsJob extends AuthenticatedESIJob
             $chars->put($recipChar, $recipChar);
         }
 
+        // Finally store them in the DB
         \DB::transaction(function ($db) use ($mails, $recipients, $labels, $unknownCharacterMails){
             CharacterMail::insert($mails->toArray());
             CharacterMailRecipient::insert($recipients->toArray());
@@ -100,14 +107,17 @@ class CharacterMailsJob extends AuthenticatedESIJob
         });
 
 
+        // If all the characters mails were not found, that means there are more
         if ($unknownCharacterMails->count() === $mailIds->count()) {
             dispatch(new CharacterMailsJob($this->token, $mailIds->last()));
         }
 
+        // Get all the mail bodies.
         foreach ($mails->pluck('mail_id') as $mail) {
             dispatch( new CharacterMailJob($this->token, $mail) );
         }
 
+        // And finally update characters as well.
         $knownChars = Character::select('character_id')->whereIn('character_id', $chars)->get()->pluck('character_id');
         $unknownChars = $chars->diff($knownChars);
         foreach ($unknownChars as $char) {

@@ -168,7 +168,8 @@ return [
             \App\Jobs\Character\CharacterAttributesJob::class,
             \App\Jobs\Character\CharacterAssetsJob::class,
             \App\Jobs\Character\CharacterBlueprintsJob::class,
-            \App\Jobs\Character\CharacterChatChannelsJob::class,
+            // Endpoint removed/deprecated???
+            // \App\Jobs\Character\CharacterChatChannelsJob::class,
             \App\Jobs\Character\CharacterClonesJob::class,
             \App\Jobs\Character\CharacterContactsJob::class,
             \App\Jobs\Character\CharacterContractsJob::class,
