@@ -12,7 +12,6 @@ use Carbon\Carbon;
 
 class CharacterMailsJob extends AuthenticatedESIJob
 {
-
     protected $lastMailId;
 
     public function __construct(Token $token, int $lastMailId = 0)
