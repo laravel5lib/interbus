@@ -10,6 +10,9 @@ use App\Models\Token;
 use App\Models\Universe\UniverseStation;
 use App\Models\Universe\UniverseStructure;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +34,14 @@ class AppServiceProvider extends ServiceProvider
             'structure' => UniverseStructure::class,
             'other' => UniverseStructure::class,
         ]);
+
+        Queue::before(function (JobProcessing $event){
+            // TODO take intou account DT
+        });
+
+        Queue::failing(function (JobFailed $event) {
+            // TODO setup notifications.
+        });
     }
 
     /**

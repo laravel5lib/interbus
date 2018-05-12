@@ -14,7 +14,7 @@ class CharacterJournalEntry extends Migration
     public function up()
     {
         Schema::create('character_journal_entries', function (Blueprint $table) {
-            $table->bigInteger('ref_id');
+            $table->bigInteger('id');
             $table->dateTime('date');
             $table->string('ref_type');
             $table->bigInteger('first_party_id')->nullable();
@@ -26,8 +26,11 @@ class CharacterJournalEntry extends Migration
             $table->string('reason')->nullable();
             $table->bigInteger('tax_receiver_id')->nullable();
             $table->double('tax')->nullable();
+            $table->bigInteger('context_id')-> nullable();
+            $table->string('context_type')->nullable();
+            $table->string('description');
             $table->timestamps();
-            $table->primary('ref_id');
+            $table->primary('id');
             $table->index('first_party_id');
             $table->index('second_party_id');
         });

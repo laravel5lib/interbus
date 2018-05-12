@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Collection;
 use tristanpollard\ESIClient\Services\ESIClient;
 
 abstract class ESIJob implements ShouldQueue
@@ -18,6 +19,8 @@ abstract class ESIJob implements ShouldQueue
     public $version = "";
 
     protected $uid;
+
+    protected $optionalColumns = [];
 
     public $tries = 1;
 
@@ -37,6 +40,17 @@ abstract class ESIJob implements ShouldQueue
     protected function getClient(): ESIClient{
         $client = app()->make(ESIClient::class);
         return $client;
+    }
+
+    protected function mapRequiredColumns(Collection $collection): Collection{
+        return $collection->map(function ($item){
+            foreach ($this->optionalColumns as $column) {
+                if (!isset($item[$column])) {
+                    $item[$column] = null;
+                }
+            }
+            return $item;
+        });
     }
 
 }

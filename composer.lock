@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be03efafa557f15d48cd60d1e95e29db",
+    "content-hash": "144456d0c35ef64f3e647c994fe5074d",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -3749,6 +3749,70 @@
             "time": "2016-10-03T07:35:21+00:00"
         },
         {
+            "name": "spatie/laravel-permission",
+            "version": "2.12.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-permission.git",
+                "reference": "c352d83ecb5efb2d68169a1de7b7e263135ad807"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/c352d83ecb5efb2d68169a1de7b7e263135ad807",
+                "reference": "c352d83ecb5efb2d68169a1de7b7e263135ad807",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "~5.3.0|~5.4.0|~5.5.0|~5.6.0",
+                "illuminate/container": "~5.3.0|~5.4.0|~5.5.0|~5.6.0",
+                "illuminate/contracts": "~5.3.0|~5.4.0|~5.5.0|~5.6.0",
+                "illuminate/database": "~5.4.0|~5.5.0|~5.6.0",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~3.3.0|~3.4.2|^3.5.0",
+                "phpunit/phpunit": "^5.7|6.2|^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Permission\\PermissionServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Permission\\": "src"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Permission handling for Laravel 5.4 and up",
+            "homepage": "https://github.com/spatie/laravel-permission",
+            "keywords": [
+                "acl",
+                "laravel",
+                "permission",
+                "security",
+                "spatie"
+            ],
+            "time": "2018-04-23T19:06:39+00:00"
+        },
+        {
             "name": "swiftmailer/swiftmailer",
             "version": "v6.0.2",
             "source": {
@@ -4762,12 +4826,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:tristanpollard/esiclient.git",
-                "reference": "ca75a53876e42f7def75f4c9657c777399671ec6"
+                "reference": "c7b81c9194a955e1e4d5710e897bb21cc77a6f07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tristanpollard/esiclient/zipball/ca75a53876e42f7def75f4c9657c777399671ec6",
-                "reference": "ca75a53876e42f7def75f4c9657c777399671ec6",
+                "url": "https://api.github.com/repos/tristanpollard/esiclient/zipball/c7b81c9194a955e1e4d5710e897bb21cc77a6f07",
+                "reference": "c7b81c9194a955e1e4d5710e897bb21cc77a6f07",
                 "shasum": ""
             },
             "require": {
@@ -4801,7 +4865,7 @@
                 "source": "https://github.com/tristanpollard/esiclient/tree/master",
                 "issues": "https://github.com/tristanpollard/esiclient/issues"
             },
-            "time": "2018-05-10T06:10:33+00:00"
+            "time": "2018-05-12T12:28:38+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

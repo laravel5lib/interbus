@@ -27,6 +27,7 @@ class AuthenticatedESIJob extends ESIJob{
 
     protected function authenticated(): bool {
         $scopes = $this->token->scopes->pluck('scope');
+        dd($scopes);
         if (!$scopes->contains($this->scope) && $this->scope){
             return false;
         }

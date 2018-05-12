@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'prefix' => env('HORIZON_PREFIX', 'horizon:'),
+    'prefix' => env('HORIZON_PREFIX', 'interbus:horizon:'),
 
     /*
     |--------------------------------------------------------------------------
@@ -80,6 +80,14 @@ return [
                 'tries' => 3,
                 'timeout' => 60,
             ],
+            'interbus-supervisor-long' => [
+                'connection' => 'redis',
+                'queue' => ['long'],
+                'balance' => 'simple',
+                'processes' => 1,
+                'tries' => 1,
+                'timeout' => 600,
+            ]
         ],
         'dev' => [
             'interbus-supervisor-main' => [
@@ -90,6 +98,14 @@ return [
                 'tries' => 3,
                 'timeout' => 60,
             ],
+            'interbus-supervisor-long' => [
+                'connection' => 'redis',
+                'queue' => ['long'],
+                'balance' => 'simple',
+                'processes' => 1,
+                'tries' => 1,
+                'timeout' => 600,
+            ]
         ],
         'local' => [
             'interbus-supervisor-main' => [

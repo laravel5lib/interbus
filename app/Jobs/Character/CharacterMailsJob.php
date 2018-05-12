@@ -57,7 +57,11 @@ class CharacterMailsJob extends AuthenticatedESIJob
                     $from_type = 'mailing_list';
                 }
                 $mails->put($key, array_merge($mails->get($key), ['from_type' => $from_type]));
-                $returnRecips[] = array_merge($recipient, ['mail_id' => $key]);
+
+                // Skip this character as teh recipient as we  will add them as a recipieint later to ALL mails.
+                if ( ($recipient['recipient_id'] !== $this->getId() && $recipient['recipient_type'] === 'character') || $recipient['recipient_type'] !== 'character') {
+                    $returnRecips[] = array_merge($recipient, ['mail_id' => $key]);
+                }
             }
             return $returnRecips;
         });
@@ -81,6 +85,9 @@ class CharacterMailsJob extends AuthenticatedESIJob
             if (isset($mail['recipients'])) {
                 unset($mail['recipients']);
             }
+            if (!isset($mail['is_read'])) {
+                $mail['is_read'] = false;
+            }
             $mail['timestamp'] = Carbon::parse($mail['timestamp']);
 
             return array_merge($mail, ['updated_at' => $now, 'created_at' => $now]);
@@ -97,18 +104,23 @@ class CharacterMailsJob extends AuthenticatedESIJob
             $chars->put($recipChar, $recipChar);
         }
 
+
         // Finally store them in the DB
         \DB::transaction(function ($db) use ($mails, $recipients, $labels, $unknownCharacterMails){
             CharacterMail::insert($mails->toArray());
-            CharacterMailRecipient::insert($recipients->toArray());
             if ($unknownCharacterMails->count()) {
                 CharacterFetchedMails::insert($unknownCharacterMails->toArray());
+                // This character is obviously the recipient of all the mails...
+                $ourRecip = $unknownCharacterMails->map(function ($mail){
+                    return ['mail_id' => $mail['mail_id'], 'recipient_id' => $this->getId(), 'recipient_type' => 'character'];
+                });
+                $recipients = $recipients->merge($ourRecip);
             }
+            CharacterMailRecipient::insert($recipients->toArray());
         });
 
-
         // If all the characters mails were not found, that means there are more
-        if ($unknownCharacterMails->count() === $mailIds->count()) {
+        if ($unknownCharacterMails->count() === $mailIds->count() && $mailIds->count()) {
             dispatch(new CharacterMailsJob($this->token, $mailIds->last()));
         }
 

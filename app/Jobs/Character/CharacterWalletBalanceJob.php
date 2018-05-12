@@ -16,9 +16,9 @@ class CharacterWalletBalanceJob extends AuthenticatedESIJob{
      */
     public function handle()
     {
-        if (!$this->authenticated()){
-            return;
-        }
+//        if (!$this->authenticated()){
+//            return;
+//        }
 
         $this->logStart();
 
