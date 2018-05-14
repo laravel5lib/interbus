@@ -26,17 +26,17 @@ class CharacterNotificationsJob extends AuthenticatedESIJob
             ->whereIn('notification_id', $notifications->pluck('notification_id'))
             ->get();
 
-        foreach ($knownNotifications as $knownNotification) {
-            $knownNotification = collect($knownNotification);
+        foreach ($knownNotifications as $dbNotification) {
+            $knownNotification = collect($dbNotification);
             $knownNotification = $knownNotification->filter(function ($notification){
                 return $notification !== null;
             });
             $esiNotification = $notifications[$knownNotification['notification_id']];
             $esiNotification['timestamp'] = Carbon::parse($esiNotification['timestamp']);
             $knownNotification['timestamp'] = Carbon::parse($knownNotification['timestamp']);
-            if ($esiNotification == $knownNotification->toArray()) {
-                $knownNotification->fill($esiNotification);
-                $knownNotification->save();
+            if ($esiNotification != $knownNotification->toArray()) {
+                $dbNotification->fill($esiNotification);
+                $dbNotification->save();
             }
             $notifications->forget($knownNotification['notification_id']);
         }

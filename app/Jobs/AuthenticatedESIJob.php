@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Token;
 use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Expr\Cast\Int_;
 use tristanpollard\ESIClient\Services\ESIClient;
 
 class AuthenticatedESIJob extends ESIJob{
@@ -13,6 +14,8 @@ class AuthenticatedESIJob extends ESIJob{
     protected $uid;
 
     protected $scope = "";
+
+    protected $role = "";
 
     public function __construct(Token $token)
     {
@@ -25,10 +28,25 @@ class AuthenticatedESIJob extends ESIJob{
         return $this->token->character_id;
     }
 
+    public function getCharacterId(): Int
+    {
+        return $this->token->character_id;
+    }
+
     protected function authenticated(): bool {
-        $scopes = $this->token->scopes->pluck('scope');
-        if (!$scopes->contains($this->scope) && $this->scope){
-            return false;
+
+        if ($this->scope) {
+            $scopes = $this->token->scopes->pluck('scope');
+            if (!$scopes->contains($this->scope)) {
+                return false;
+            }
+        }
+
+        if ($this->role) {
+            $roles = $this->token->roles->pluck('role');
+            if (!$roles->contains($this->role)) {
+                return false;
+            }
         }
 
         return true;
@@ -55,6 +73,7 @@ class AuthenticatedESIJob extends ESIJob{
     protected function getClient(): ESIClient
     {
        $client = parent::getClient();
+      // $this->token->access_token = 'FrEo7WR0PEeb1ofANo83X2r8vzMP5GyDeRMn2kWycXje9dDxZx8mhRPaEqrO_ftxYd4AZ5I1xpBdw9VforMhDQ2';
        $client->setToken($this->token);
        return $client;
     }
@@ -66,5 +85,13 @@ class AuthenticatedESIJob extends ESIJob{
     public function shouldDispatch()
     {
         return $this->authenticated();
+    }
+
+    public function getScope(): string{
+        return $this->scope;
+    }
+
+    public function getRole(): string{
+        return $this->role;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
 return [
-    'discord_webhook_url' => env('DISCORD_WEBHOOK_URL')
+    'channels' => [
+        'default' => env('DISCORD_WEBHOOK_URL'),
+    ]
 ];

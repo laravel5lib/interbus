@@ -43,7 +43,7 @@ class TitlesTable extends Component{
                 <tbody>
                 { this.state.titles.map(function (title) {
                     return (
-                        <tr>
+                        <tr key={title.title_id}>
                             <td dangerouslySetInnerHTML={{__html: title.name}} />
                         </tr>
                     )

@@ -12,6 +12,10 @@ use App\Jobs\AuthenticatedESIJob;
 class CharacterSkillQueueJob extends AuthenticatedESIJob
 {
 
+    protected $optionalColumns = ['finish_date', 'level_end_sp', 'level_start_sp', 'start_date', 'training_start_sp'];
+
+    protected $dateFields = ['start_date', 'finish_date'];
+
     /**
      * Execute the job.
      *
@@ -26,12 +30,8 @@ class CharacterSkillQueueJob extends AuthenticatedESIJob
         $queue = $response->get('result')->keyBy(function ($item){
             return $item['skill_id'] . ':' . $item['finished_level'];
         });
-        $queue = $queue->map(function ($queue){
-            $queue['start_date'] = Carbon::parse($queue['start_date']);
-            $queue['finish_date'] = Carbon::parse($queue['finish_date']);
-            return $queue;
-        });
-        $ignore = $queue->pluck('skill_id', 'finished_level');
+        $queue = $this->mapDateColumns($queue);
+        $ignore = $queue->values();
 
         $knownSkillQueues = CharacterSkillQueue::select('id', 'skill_id', 'finished_level', 'queue_position', 'start_date', 'finish_date', 'level_end_sp', 'level_start_sp', 'training_start_sp')
             ->where('character_id', $this->getId())
@@ -40,12 +40,15 @@ class CharacterSkillQueueJob extends AuthenticatedESIJob
 
         foreach ($knownSkillQueues as $knownSkillQueue) {
             $key = $knownSkillQueue['skill_id'] . ':' . $knownSkillQueue['finished_level'];
+            if (!isset($queue[$key])) {
+                $knownSkillQueue->delete();
+                continue;
+            }
             $esiSkillQueue = $queue[$key];
 
-            $knownSkillQueue['start_date'] = Carbon::parse($knownSkillQueue['start_date']);
-            $knownSkillQueue['finish_date'] = Carbon::parse($knownSkillQueue['finish_date']);
-
-            if ($esiSkillQueue != collect($knownSkillQueue)->except(['id'])->toArray()) {
+            $knownSkillQueue = $this->mapDateColumn($knownSkillQueue);
+            if ($esiSkillQueue != collect($knownSkillQueue)->except(['id'])->filter()->toArray()) {
+                $esiSkillQueue = $this->mapRequiredColumn($esiSkillQueue);
                 $knownSkillQueue->fill($esiSkillQueue);
                 $knownSkillQueue->save();
             }
@@ -61,11 +64,13 @@ class CharacterSkillQueueJob extends AuthenticatedESIJob
         }
 
         $deleteQuery = CharacterSkillQueue::where('character_id', $this->getId());
-        foreach ($ignore as $id => $finish ) {
-            $deleteQuery->where(function ($query) use ($id, $finish) {
-                $query->where('skill_id', '!=', $id)->where('finished_level', '!=', $finish);
+        foreach ($ignore as $ignoreQueue ) {
+            $deleteQuery->where(function ($query) use ($ignoreQueue) {
+                $query->where('skill_id', '!=', $ignoreQueue['skill_id']);
+                $query->where('finished_level', '!=', $ignoreQueue['finished_level']);
             });
         }
+        $deleteQuery->orWhereNotIn('skill_id', $ignore->pluck('skill_id'));
         $deleteQuery->delete();
 
         $this->logFinished();

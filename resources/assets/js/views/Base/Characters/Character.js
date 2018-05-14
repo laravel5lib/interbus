@@ -9,7 +9,6 @@ import SkillsTable from '../../../components/SkillsTable/SkillsTable';
 import TitlesTable from '../../../components/TitlesTable/TitlesTable';
 import RolesTable from '../../../components/RolesTable/RolesTable';
 import MailTable from '../../../components/MailTable/MailTable';
-import ChatChannelsTable from '../../../components/ChatChannelsTables/ChatChannelsTable';
 import ClonesTable from '../../../components/ClonesTable/ClonesTable';
 import SkillQueueTable from '../../../components/SkillQueueTable/SkillQueueTable';
 import CharacterSheetTable from '../../../components/CharacterSheetTable/CharacterSheetTable';
@@ -98,13 +97,6 @@ class Character extends Component {
                             </NavItem>
                             <NavItem>
                                 <NavLink
-                                    className={classnames({ active: this.state.activeTab === 'Chat' })}
-                                    onClick={() => { this.toggle('Chat'); }} >
-                                    Chat Channels
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
                                     className={classnames({ active: this.state.activeTab === 'Clones' })}
                                     onClick={() => { this.toggle('Clones'); }} >
                                     Clones
@@ -166,12 +158,6 @@ class Character extends Component {
                                     <CharacterSheetTable character={this.state.character}
                                                        key={this.state.character.character_id}/>
                                 </TabPane>
-                                {(this.state.activeTab === 'Chat' || this.state.loadedTabs.indexOf('Chat') !== -1) &&
-                                <TabPane tabId="Chat">
-                                    <ChatChannelsTable id={this.state.character.character_id}
-                                                   key={this.state.character.character_id}/>
-                                </TabPane>
-                                }
                                 {(this.state.activeTab === 'Clones' || this.state.loadedTabs.indexOf('Clones') !== -1) &&
                                 <TabPane tabId="Clones">
                                     <ClonesTable id={this.state.character.character_id}

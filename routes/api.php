@@ -43,7 +43,7 @@ Route::get('/tokens', function (Request $request) {
 
 })->middleware('auth:passport');
 
-Route::group(['middleware' => ['auth:passport']], function ()
+Route::group([], function ()
 {
 
     Route::middleware('auth:passport')->get('/user', function (Request $request) {
@@ -121,8 +121,4 @@ Route::group(['middleware' => ['auth:passport']], function ()
             ]
         ];
     });
-});
-
-Route::get('/{any?}', function ($any = null) {
-    return ['route' => $any];
 });

@@ -14,7 +14,7 @@ use GuzzleHttp\RequestOptions;
 class CharacterWalletJournalJob extends AuthenticatedESIJob
 {
 
-    protected $scope = 'esi-wallet.read_character_wallet.v1';
+    // protected $scope = 'esi-wallet.read_character_wallet.v1';
 
     protected $page;
 

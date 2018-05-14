@@ -14,9 +14,19 @@ class DiscordWebhookProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(DiscordWebhookService::class, function($app){
+        $this->app->bind(DiscordWebhookService::class, function($app, $channels){
+
+            $channel = 'default';
+            if ($channels) {
+                $channel = $channels[0];
+            }
+            $channel = config('discord.channels.' . $channel);
+            if (!$channel) {
+                throw new \InvalidArgumentException('Invalid Channel!');
+            }
+
             $guzzle = new \GuzzleHttp\Client([
-                'base_uri' => config('discord.discord_webhook_url')
+                'base_uri' => $channel,
             ]);
            return new DiscordWebhookService($guzzle);
         });

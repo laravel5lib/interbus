@@ -45,15 +45,15 @@ class CharacterContactsJob extends AuthenticatedESIJob{
         CharacterContact::whereNotIn('contact_id', $allIds)->where('owner_id', $this->getId())->delete();
 
         $existingContacts = CharacterContact::select('id', 'contact_id', 'contact_type', 'standing', 'is_watched', 'label_id')->whereIn('contact_id', $allIds)->where('owner_id', $this->getId())->get();
-        foreach ($existingContacts as $existingContact) {
+        foreach ($existingContacts as $dbContact) {
             //Strip all null values for comparison...
-            $existingContact = collect($existingContact)->filter(function ($value){
+            $existingContact = collect($dbContact)->filter(function ($value){
                 return $value !== null;
             });
             $esiContact = $contacts[$existingContact['contact_id']];
             if ( $esiContact != collect($existingContact)->except(['id'])->toArray() ) {
-                $existingContact->fill($esiContact);
-                $existingContact->save();
+                $dbContact->fill($esiContact);
+                $dbContact->save();
             }
             $contacts->forget($existingContact['contact_id']);
         }

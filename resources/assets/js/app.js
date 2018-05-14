@@ -22,6 +22,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, Switch} from 'react-router-dom';
 
+import axios from 'axios';
+
 // Styles
 // Import Flag Icons Set
 import 'flag-icon-css/css/flag-icon.min.css';
@@ -64,6 +66,17 @@ require('./bootstrap');
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+axios.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    if (error.response.status === 401) {
+        localStorage.removeItem('token');
+        history.push('/login');
+    } else {
+        return Promise.reject(error);
+    }
+});
 
 ReactDOM.render((
     <Provider store={store}>

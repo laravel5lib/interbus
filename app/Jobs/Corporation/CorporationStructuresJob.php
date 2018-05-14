@@ -14,7 +14,13 @@ class CorporationStructuresJob extends AuthenticatedESIJob
 
     use CorporationJob;
 
-    protected $scope = 'esi-corporations.read_structures.v1';
+    //protected $scope = 'esi-corporations.read_structures.v1';
+
+    protected $role = 'Station_Manager';
+
+    protected $optionalColumns = ['fuel_expires', 'next_reinforce_apply', 'next_reinforce_hour', 'next_reinforce_weekday', 'state_timer_end', 'state_timer_start', 'unanchors_at'];
+
+    protected $dateFields = ['fuel_expires', 'next_reinforce_apply', 'state_timer_end', 'state_timer_start', 'unanchors_at'];
 
     /**
      * Execute the job.
@@ -23,6 +29,7 @@ class CorporationStructuresJob extends AuthenticatedESIJob
      */
     public function handle()
     {
+
         $structures = $this->getClient()->invoke('/corporations/' . $this->getId() . '/structures/');
         $structures = $structures->get('result')->keyBy('structure_id');
 
@@ -34,60 +41,66 @@ class CorporationStructuresJob extends AuthenticatedESIJob
             ->get();
 
         $deleteServiceQuery = CorporationStructureService::query();
-        $structureServices = [];
+        $services = [];
         foreach ($knownStructures as $knownStructure) {
             $esiStructure = $structures->get($knownStructure['structure_id']);
-            $services = $esiStructure['services'];
-            $services = array_map(function ($service) use ($esiStructure) {
-                $service['structure_id'] = $esiStructure['structure_id'];
-                return $service;
-            }, $services);
-            $esiStructure['services'] = $services;
-            if ($esiStructure == collect($knownStructure->toArray())->filter()->except(['created_at', 'updated_at'])->toArray()) {
+            if (isset($esiStructure['services'])) {
                 $services = $esiStructure['services'];
-                $time = Carbon::now();
-                unset($esiStructure['services']);
-                $knownStructure->fill($esiStructure);
-                $knownStructure->save();
-                foreach ($services as $service) {
-                    $deleteServiceQuery->where(function ($query) use ($service){
-                        $query->where('state', '!=', $service['state']);
-                        $query->where('name', '!=', $service['name']);
-                        $query->where('structure_id', '!=', $service['structure_id']);
-                    });
+                $services = array_map(function ($service) use ($esiStructure) {
+                    $service['structure_id'] = $esiStructure['structure_id'];
+                    return $service;
+                }, $services);
+                $esiStructure['services'] = $services;
+            }
+
+            $esiStructure = $this->mapDateColumn($esiStructure);
+            $compare = collect($knownStructure->toArray())->filter()->except(['created_at', 'updated_at']);
+            $compare = $this->mapDateColumn($compare->toArray());
+            if ($esiStructure != $compare) {
+                $esiStructure = $this->mapRequiredColumn($esiStructure);
+                $esiStructure = $this->mapDateColumn($esiStructure);
+
+                if (isset($esiStructure['services'])) {
+                    $services = $esiStructure['services'];
+                    unset($esiStructure['services']);
+                    foreach ($services as $service) {
+                        $deleteServiceQuery->where(function ($query) use ($service){
+                            $query->where('state', '!=', $service['state']);
+                            $query->where('name', '!=', $service['name']);
+                            $query->where('structure_id', '!=', $service['structure_id']);
+                        });
+                    }
+                    $knownStructure->services()->delete();
+                    $knownStructure->services()->insert($services);
                 }
 
+                $knownStructure->fill($esiStructure);
+                $knownStructure->updated_at = Carbon::now();
+                $knownStructure->save();
             }
             $structures->forget($knownStructure['structure_id']);
         }
 
         if ($structures->count()) {
-            DB::transaction(function ($db) use ($structures){
-                $services = [];
-                $time = Carbon::now();
-                $columns = ['fuel_expires', 'next_reinforce_apply', 'next_reinforce_hour', 'next_reinforce_weekday', 'state_timer_end', 'state_timer_start', 'unanchors_at'];
-                $dateFields = ['fuel_expires', 'next_reinforce_apply', 'state_time_end', 'state_timer_start', 'uanchors_at'];
-                $structures = $structures->map(function ($value) use (&$services, $columns, $time, $dateFields){
-                    if (isset($value['services'])) {
-                        $services[$value['structure_id']] = array_merge(['structure_id' => $value['structure_id']], ...$value['services']);
-                        unset($value['services']);
+
+            $services = [];
+            $structures = $structures->map(function ($value) use (&$services){
+                if (isset($value['services'])) {
+                    foreach ($value['services'] as $service) {
+                        $services[$value['structure_id']][] = array_merge(['structure_id' => $value['structure_id']], $service);
                     }
-                    foreach ($dateFields as $dateField) {
-                        if (isset($value[$dateField])) {
-                            $value[$dateField] = Carbon::parse($value[$dateField]);
-                        }
-                    }
-                    foreach ($columns as $column) {
-                        if (!isset($value[$column])){
-                            $value[$column] = null;
-                        }
-                    }
-                    $value['updated_at'] = $time;
-                    $value['created_at'] = $time;
-                    return $value;
-                });
+                    unset($value['services']);
+                }
+                return $value;
+            });
+            $services = collect($services)->flatten(1);
+            $services = $this->addDateFields($services);
+            $structures = $this->mapRequiredColumns($structures);
+            $structures = $this->mapDateColumns($structures);
+            $structures = $this->addDateFields($structures);
+            DB::transaction(function ($db) use ($structures, $services){
                 CorporationStructure::insert($structures->toArray());
-                CorporationStructureService::insert($services);
+                CorporationStructureService::insert($services->toArray());
             });
         }
     }

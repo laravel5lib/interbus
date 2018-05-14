@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Character\Character;
+use App\Models\Character\CharacterRoles;
 use App\Models\Scope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,10 @@ class Token extends Model
 
     public function scopes(){
         return $this->hasMany(Scope::class, 'token');
+    }
+
+    public function roles() {
+        return $this->hasManyThrough(CharacterRoles::class, Character::class, 'character_id', 'character_id', 'character_id');
     }
 
     public function authorization(){
